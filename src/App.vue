@@ -4,6 +4,10 @@
       app
       color="white"
       flat
+
+      v-if="isLogin"
+      elevate-on-scroll
+      
     >
      <v-app-bar-nav-icon></v-app-bar-nav-icon>
       
@@ -18,21 +22,20 @@
         />
         <span  class="primary--text font-weight-medium text-h6">BB-DMS</span> 
       </v-btn>    
-    
-
-      <v-spacer></v-spacer>
-                  <v-btn color="primary" dark class="mb-2"   @click.stop="dialog = true" >New Investors</v-btn>
+    <v-spacer></v-spacer>
+      <span class="text-button">Whyte Peter</span>
+     
 
     </v-app-bar>
 
-    <v-main class="blue-grey lighten-5"> 
+    <v-main   class="blue-grey lighten-5"> 
       <router-view/>
     </v-main>
   </v-app>
 </template>
 
 <script>
-
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'App',
@@ -40,6 +43,13 @@ export default {
   data: () => ({
     //
   }),
+  computed: {
+    ...mapGetters({isLogin:"Get_Login"})
+  },
+  created(){
+    this.$store.dispatch("Init_Investors")
+  }
+ 
 };
 </script>
 <style scoped>

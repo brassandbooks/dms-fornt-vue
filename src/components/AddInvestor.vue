@@ -2,7 +2,7 @@
 <v-container>
     <v-row>
         <v-col cols="12">
-            <v-dialog persistent v-model="dialog.invest" max-width="500px">
+            <v-dialog persistent v-model="dialog" max-width="500px">
                 <v-card>
                     <v-card-title class="primary--text pt-6 ">
                         <v-icon large color="primary" class="mr-4">
@@ -48,8 +48,9 @@
 
 <script>
 export default {
+    name:"AddInvestor",
     props: {
-        dialog: Object,
+        dialog: Boolean,
         toggle: Function
     },
     data: () => ({
@@ -62,7 +63,7 @@ export default {
     }),
     methods: {
         close() {
-            this.toggle(false, "invest")
+            this.toggle(false)
         },
         save() {
             console.log('save');

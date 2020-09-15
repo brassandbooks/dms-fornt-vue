@@ -2,13 +2,16 @@
 <v-container>
     <v-row>
         <v-col cols="12">
-            <v-dialog persistent v-model="dialog.invest" max-width="500px">
+            <v-dialog persistent v-model="dialog.edit" max-width="500px">
                 <v-card>
                     <v-card-title class="primary--text pt-6 ">
                         <v-icon large color="primary" class="mr-4">
                             mdi-account-plus
                         </v-icon>
-                        <span class="headline">Add New Investors</span>
+                        <span class="headline">Edit Account</span>
+
+                        <v-spacer></v-spacer>
+                        <span class="text-caption">Peter Emmanuel Whyte</span>
                     </v-card-title>
 
                     <v-card-text>
@@ -48,7 +51,9 @@
 
 <script>
 export default {
+    name:"EditInvestor",
     props: {
+        investor:Object,
         dialog: Object,
         toggle: Function
     },
@@ -62,7 +67,7 @@ export default {
     }),
     methods: {
         close() {
-            this.toggle(false, "invest")
+            this.toggle(false, "edit")
         },
         save() {
             console.log('save');
