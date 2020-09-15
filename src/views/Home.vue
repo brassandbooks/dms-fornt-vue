@@ -32,7 +32,7 @@
             </v-data-table>
         </v-col>
         <v-col cols="12">
-            <add-investor :dialog="dialog" :toggle="toggle" />
+            <add-investor :dialog="dialog" :toggle="toggle " />
         </v-col>
     </v-row>
 

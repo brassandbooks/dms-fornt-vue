@@ -7,7 +7,7 @@
                 Go Back
             </v-btn>
 
-     <v-btn  color="primary secondary--text" dark class="mb-2"   @click.stop="toggle(true, 'invest')" >New Investment</v-btn>
+     <v-btn  color="primary secondary--text " dark class="mb-2"   @click.stop="toggle(true, 'invest')" >New Investment</v-btn>
         </v-col>
         <v-col cols="12">
             <v-card class="px-3">

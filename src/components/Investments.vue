@@ -2,7 +2,7 @@
 <v-container>
     <v-row justify="center">
         <v-col cols="12">
-            <v-data-table :search="search"  loading-text="Loading... Please wait" :headers="headers" :items="investments" sort-by="calories" class="elevation-1">
+            <v-data-table :search="search"   loading-text="Loading... Please wait" :headers="headers" :items="investments" sort-by="calories" class="elevation-1">
                 <template v-slot:top>
                     <v-toolbar flat color="white">
                         <v-toolbar-title>INVESTMENTS</v-toolbar-title>

@@ -22,7 +22,7 @@
         />
         <span  class="primary--text font-weight-medium text-h6">BB-DMS</span> 
       </v-btn>    
-    <v-spacer></v-spacer>
+    <v-spacer> </v-spacer>
       <span class="text-button">Whyte Peter</span>
      
 
