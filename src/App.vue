@@ -2,59 +2,93 @@
   <v-app>
     <v-app-bar
       app
-      color="primary"
-      dark
+      color="white"
+      flat
+
+      v-if="isLogin"
+      elevate-on-scroll
+      
     >
-      <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
+     <v-app-bar-nav-icon></v-app-bar-nav-icon>
+      
+      <v-btn depressed text color="white"  to="/" class=" d-flex align-center">
+          <v-img
+          alt="Brass & Books"
+          class="shrink mx-2"
           contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
+          src="./assets/logo.png"
           transition="scale-transition"
           width="40"
         />
+        <span  class="primary--text font-weight-medium text-h6">BB-DMS</span> 
+      </v-btn>    
+    <v-spacer> </v-spacer>
+     
+     
+ <v-menu v-if="user !== null"
+      transition="slide-y-transition"
+      bottom
+      offset-y
+    >
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn
+          color="primary"
+          dark
+          text
+          v-bind="attrs"
+          v-on="on"
+        >
+         {{user.fullName}}
+         
+        </v-btn>
+      </template>
+      <v-list>
+        <v-list-item
 
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
-
-      <v-spacer></v-spacer>
-
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
+         @click="logout"
+        > <v-list-item-icon>    
+         <v-icon color="primary" class="px-0">
+           mdi-logout
+         </v-icon>
+        </v-list-item-icon>
+          <v-list-item-title>Logout</v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </v-menu>
     </v-app-bar>
 
-    <v-main>
-      <HelloWorld/>
+    <v-main    class="blue-grey lighten-5"> 
+      <router-view/>
     </v-main>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld';
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
   name: 'App',
 
-  components: {
-    HelloWorld,
-  },
-
   data: () => ({
-    //
+  
   }),
+  computed: {
+    ...mapGetters({user:"Get_User", isLogin:"Get_Login"})
+  },
+  created(){
+    this.$store.dispatch('authenticated', "/")
+  },
+  methods: {
+     ...mapActions({log:"logoutUser"}),
+    logout(){
+     this.log()
+    }
+  }
+ 
 };
 </script>
+<style scoped>
+.logo-text {
+  cursor: pointer;
+}
+</style>
