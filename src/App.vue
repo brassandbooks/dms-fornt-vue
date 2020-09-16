@@ -23,31 +23,66 @@
         <span  class="primary--text font-weight-medium text-h6">BB-DMS</span> 
       </v-btn>    
     <v-spacer> </v-spacer>
-      <span class="text-button">Whyte Peter</span>
      
+     
+ <v-menu v-if="user !== null"
+      transition="slide-y-transition"
+      bottom
+      offset-y
+    >
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn
+          color="primary"
+          dark
+          text
+          v-bind="attrs"
+          v-on="on"
+        >
+         {{user.fullName}}
+         
+        </v-btn>
+      </template>
+      <v-list>
+        <v-list-item
 
+         @click="logout"
+        > <v-list-item-icon>    
+         <v-icon color="primary" class="px-0">
+           mdi-logout
+         </v-icon>
+        </v-list-item-icon>
+          <v-list-item-title>Logout</v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </v-menu>
     </v-app-bar>
 
-    <v-main   class="blue-grey lighten-5"> 
+    <v-main    class="blue-grey lighten-5"> 
       <router-view/>
     </v-main>
   </v-app>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
   name: 'App',
 
   data: () => ({
-    //
+  
   }),
   computed: {
-    ...mapGetters({isLogin:"Get_Login"})
+    ...mapGetters({user:"Get_User", isLogin:"Get_Login"})
   },
   created(){
-    this.$store.dispatch("Init_Investors")
+    this.$store.dispatch('authenticated', "/")
+  },
+  methods: {
+     ...mapActions({log:"logoutUser"}),
+    logout(){
+     this.log()
+    }
   }
  
 };

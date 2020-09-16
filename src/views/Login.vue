@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row align-content="center" justify="center" style="height:100vh">
-      <v-col v-if="alert.is" cols="12" md="6" class="py-0">
+      <v-col v-if="alert.is" cols="12" sm="8" md="6" class="py-0">
         <v-alert prominent :type="alert.type">
           {{ alert.text }}
         </v-alert>
@@ -95,8 +95,11 @@ export default {
   computed: {
       ...mapGetters({loading:"Loading", alert:"Get_Alert"})
   },
+ created(){
+    this.$store.dispatch('authenticated',"/login")
+  },
   methods: {
-      ...mapActions({login:"Login_User"}),
+      ...mapActions({login:"Login_User", logout:"logoutUser"}),
     submit() {
       if (this.$refs.form.validate()) {
         const user = {

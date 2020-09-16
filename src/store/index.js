@@ -1,11 +1,12 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import router from '../router'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    login: true,
+    login: false,
     loginError: "",
     loading: {
       add: false,
@@ -19,15 +20,18 @@ export default new Vuex.Store({
       text:""
     },
 
+    toast: {
+      is:false,
+      type:"",
+      text:""
+    },
+
     dialog: {
       investment: false,
       investor: false
     },
 
-    user: {
-      email: 'admin@gmail.com',
-      password: "123456"
-    },
+    user: null,
 
     investors: [
       {
@@ -116,8 +120,14 @@ export default new Vuex.Store({
         return 0
       }
     },
+    "Get_User"(state){
+      return state.user
+    },
     "Get_Alert"(state){
       return state.alert
+    },
+    "Get_Toast"(state){
+      return state.toast
     },
     "Get_Login"(state) {
       return state.login
@@ -145,6 +155,9 @@ export default new Vuex.Store({
     "Set_Alert"(state, alert){
       state.alert = alert
     },
+    "Set_Toast"(state, toast){
+      state.toast = toast
+    },
 
     "Set_Login"(state, login) {
       state.login = login
@@ -166,7 +179,6 @@ export default new Vuex.Store({
   actions: {
 
     async "Init_Investors"(){
-      console.log('start');
       await fetch("https://bbdms.herokuapp.com/api/auth/investor", {
         method: "GET",
         headers: {
@@ -192,7 +204,16 @@ export default new Vuex.Store({
       },5000)
 
     },
+    "Init_Toast"({commit}, toast){
+      toast.is = true
+      commit("Set_toast", toast)
+      
+      setTimeout(()=> {
+        commit("Set_Toast", {is: false, type:"", text:""})
+      },5000)
 
+    },
+  
     async "Login_User"({ commit, dispatch }, user) {
 
       commit("Set_Loading", {type:"login", value:true})
@@ -207,11 +228,16 @@ export default new Vuex.Store({
         .then(res => res.json())
         .then(resp => {
           if(resp.status == 1){
+
+            //set userToken to local storage
+            localStorage.setItem('userToken', (resp.data.token));
+  
             //set the curretn user
-            commit("Set_User", user)
+            commit("Set_User", resp.data)
             commit("Set_Login", true)
             commit("Set_Loading", {type:"login", value:false})
-            console.log(resp);
+            router.push('/')
+
           }else {
             console.log(resp);
             commit("Set_Loading", {type:"login", value:false})
@@ -223,7 +249,46 @@ export default new Vuex.Store({
           console.log(err)
         })
 
+    },
+
+    logoutUser({commit}){
+      localStorage.removeItem('userToken');
+      commit("Set_User", null)
+      commit("Set_Login", false)
+      router.push('/login')
+    },
+
+    authenticated({commit, dispatch}, path){
+      const token = localStorage.getItem('userToken')
+      if(token){
+        const decoded = Vue.$jwt.decode(token)
+        console.log(decoded)
+          if (decoded.exp < Date.now() / 1000) {
+             
+            router.push("/login")
+            dispatch("Init_Alert", {type:'error', text:"Token  has expired, please login"})
+
+          }else {
+              commit("Set_Login", true)
+              const user = {
+                email: decoded.email,
+                fullName: `${decoded.firstName} ${decoded.lastName}`,
+                id: decoded.id
+              }
+
+              commit("Set_User", user)
+              
+              if(path !== '/'){
+                router.push("/")
+              } 
+           }
+      }else {
+        if(path !== '/login'){
+          router.push("/login")
+        }
+      }
     }
+
   },
   modules: {
   }

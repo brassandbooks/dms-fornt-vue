@@ -1,5 +1,5 @@
 <template>
-<v-container>
+<v-container v-if="user !== null">
     <v-row justify="center">
         <v-col cols="12" class="py-0 d-flex justify-space-between">
             <span class="text-button primary--text">
@@ -86,7 +86,8 @@ export default {
 
     computed: {
         ...mapGetters({
-            investors: 'Get_Investors'
+            investors: 'Get_Investors',
+            user: 'Get_User'
         }),
 
     },
