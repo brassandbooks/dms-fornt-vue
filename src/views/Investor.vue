@@ -3,7 +3,7 @@
     <v-row no-gutters>
         <v-col cols="12" class="py-2 d-flex justify-space-between">
             <v-btn to="/" text depressed color="primary" class="mb-2">
-                <v-icon>mdi-arrow</v-icon>
+                <v-icon>mdi-arrow-left</v-icon>
                 Go Back
             </v-btn>
 
@@ -99,6 +99,9 @@ export default {
             totalInvestments: 'Get_TotalInvestments'
         }),
 
+    },
+    created(){
+        console.log(this.$route.params)
     },
     methods: {
         toggle(par, which){

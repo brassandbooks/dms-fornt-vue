@@ -10,6 +10,7 @@ import VueJWT from 'vuejs-jwt'
 Vue.config.productionTip = false
 Vue.use(VueJWT)
 
+
 new Vue({
   router,
   store,

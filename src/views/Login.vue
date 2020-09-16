@@ -93,7 +93,7 @@ export default {
   }),
  
   computed: {
-      ...mapGetters({loading:"Loading", alert:"Get_Alert"})
+      ...mapGetters({loading:"Get_Loading", alert:"Get_Alert"})
   },
  created(){
     this.$store.dispatch('authenticated',"/login")

@@ -9,7 +9,7 @@
             <v-btn depressed color="primary secondary--text" dark class="mb-2" @click.stop="dialog = true">New Investors</v-btn>
         </v-col>
         <v-col cols="12">
-            <v-data-table :search="search" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :items="investors" sort-by="calories" class="elevation-1">
+            <v-data-table :search="search" :loading="loading.investors" loading-text="Loading... Please wait" :headers="headers" :items="investors" sort-by="calories" class="elevation-1">
                 <template v-slot:top>
                     <v-toolbar flat color="white">
                         <v-toolbar-title>INVESTORS</v-toolbar-title>
@@ -22,13 +22,11 @@
                     </v-toolbar>
                 </template>
                 <template v-slot:item.actions="{ item }">
-                    <v-btn to="/investor" color="secondary primary--text" small depressed @click="view(item)">
+                    <v-btn   color="secondary primary--text" small depressed @click="viewInvestor(item)">
                         view
                     </v-btn>
                 </template>
-                <template v-slot:no-data>
-                    <v-btn color="primary" @click="initialize">Reset</v-btn>
-                </template>
+            
             </v-data-table>
         </v-col>
         <v-col cols="12">
@@ -53,14 +51,17 @@ export default {
     },
     data: () => ({
         dialog: false,
-        loading: false,
 
         search: '',
         headers: [{
                 text: 'Name',
                 align: 'start',
                 sortable: false,
-                value: 'name',
+                value: 'firstName',
+            },
+            {
+                text: 'Last Name',
+                value: 'lastName'
             },
             {
                 text: 'Email',
@@ -68,7 +69,7 @@ export default {
             },
             {
                 text: 'Phone Number',
-                value: 'phone'
+                value: 'phoneNumber'
             },
             {
                 text: 'No. of Investment',
@@ -87,7 +88,8 @@ export default {
     computed: {
         ...mapGetters({
             investors: 'Get_Investors',
-            user: 'Get_User'
+            user: 'Get_User',
+            loading: "Get_Loading"
         }),
 
     },
@@ -97,6 +99,11 @@ created(){
     methods: {
         toggle(par) {
             this.dialog = par
+        },
+
+        viewInvestor(investor){
+            console.log(investor._id)
+            this.$router.push(`/investors/${investor._id}`)
         }
 
     },

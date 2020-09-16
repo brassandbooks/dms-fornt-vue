@@ -57,7 +57,7 @@
     </v-menu>
     </v-app-bar>
 
-    <v-main    class="blue-grey lighten-5"> 
+    <v-main   class="blue-grey lighten-5"> 
       <router-view/>
     </v-main>
   </v-app>

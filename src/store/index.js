@@ -11,7 +11,8 @@ export default new Vuex.Store({
     loading: {
       add: false,
       update: false,
-      login: false
+      login: false,
+      investors: false,
     },
 
     alert: {
@@ -33,56 +34,7 @@ export default new Vuex.Store({
 
     user: null,
 
-    investors: [
-      {
-        id: 1,
-        name: 'Peter Emmanuel Whyte',
-        email: 'peteremmanuelwhyte@gmail.com',
-        phone: '08108139758',
-        numberOfInvestments: 7
-
-      },
-      {
-        id: 2,
-        name: 'Vonsokume Amodu',
-        email: 'vonso@gmail.com',
-        phone: '08108139758',
-        numberOfInvestments: 7
-
-      },
-      {
-        id: 3,
-        name: 'John Doe',
-        email: 'johndoe@gmail.com',
-        phone: '08108139758',
-        numberOfInvestments: 3
-
-      },
-      {
-        id: 4,
-        name: 'Daniel Epiri',
-        email: 'epiridaniel@gmail.com',
-        phone: '08108139758',
-        numberOfInvestments: 1
-
-      },
-      {
-        id: 5,
-        name: 'Gracious Nicholas',
-        email: 'nicholasgracious@gmail.com',
-        phone: '08108139758',
-        numberOfInvestments: 2
-
-      },
-      {
-        id: 6,
-        name: 'Oletu Cornelius',
-        email: 'badboyzgah@gmail.com',
-        phone: '08108139758',
-        numberOfInvestments: 2
-
-      },
-    ],
+    investors: [],
 
     investments:[
       {
@@ -132,16 +84,12 @@ export default new Vuex.Store({
     "Get_Login"(state) {
       return state.login
     },
-    "Loading"(state) {
+    "Get_Loading"(state) {
       return state.loading
     },
 
     "Get_Investors"(state) {
-      if (state.investors !== null) {
         return state.investors
-      } else {
-        return []
-      }
     },
     "Get_Investments"(state) {
       if (state.investments !== null) {
@@ -265,11 +213,11 @@ export default new Vuex.Store({
       router.push('/login')
     },
 
-    async initInvestors(){
-
+    async initInvestors({commit}){
+      commit("Set_Loading", {type:"investors", value:true})
       const token = localStorage.getItem('userToken')
-
-      await await fetch("https://bbdms.herokuapp.com/api/auth/investor", {
+      
+      await await fetch("https://bbdms.herokuapp.com/api/investor", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -278,10 +226,18 @@ export default new Vuex.Store({
       })
       .then(res => res.json())
       .then(resp => {
-        console.log(resp);
-        
+        if(resp.status == 1){
+          console.log(resp)
+        commit("Set_Investors", resp.data)
+        commit("Set_Loading", {type:"investors", value:false})
+      }else {
+        console.log(resp)
+        commit("Set_Loading", {type:"investors", value:false})
+        }
+
       }).catch(err => {
         console.log(err);
+        commit("Set_Loading", {type:"investors", value:false})
       })
     },
 
