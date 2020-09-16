@@ -91,7 +91,9 @@ export default {
         }),
 
     },
-
+created(){
+        this.$store.dispatch("initInvestors")
+},
     methods: {
         toggle(par) {
             this.dialog = par

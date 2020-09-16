@@ -231,9 +231,16 @@ export default new Vuex.Store({
 
             //set userToken to local storage
             localStorage.setItem('userToken', (resp.data.token));
-  
+
+            //decode token and set user
+            const decoded = Vue.$jwt.decode(resp.data.token)
+            const user = {
+              email: decoded.email,
+              fullName: `${decoded.firstName} ${decoded.lastName}`,
+              id: decoded.id
+            }
             //set the curretn user
-            commit("Set_User", resp.data)
+            commit("Set_User", user)
             commit("Set_Login", true)
             commit("Set_Loading", {type:"login", value:false})
             router.push('/')
@@ -258,11 +265,30 @@ export default new Vuex.Store({
       router.push('/login')
     },
 
+    async initInvestors(){
+
+      const token = localStorage.getItem('userToken')
+
+      await await fetch("https://bbdms.herokuapp.com/api/auth/investor", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token} `,
+        },
+      })
+      .then(res => res.json())
+      .then(resp => {
+        console.log(resp);
+        
+      }).catch(err => {
+        console.log(err);
+      })
+    },
+
     authenticated({commit, dispatch}, path){
       const token = localStorage.getItem('userToken')
       if(token){
         const decoded = Vue.$jwt.decode(token)
-        console.log(decoded)
           if (decoded.exp < Date.now() / 1000) {
              
             router.push("/login")
@@ -275,7 +301,6 @@ export default new Vuex.Store({
                 fullName: `${decoded.firstName} ${decoded.lastName}`,
                 id: decoded.id
               }
-
               commit("Set_User", user)
               
               if(path !== '/'){
