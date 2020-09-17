@@ -35,6 +35,7 @@ export default new Vuex.Store({
     user: null,
 
     investors: [],
+    investor: null,
 
     investments:[
       {
@@ -91,6 +92,9 @@ export default new Vuex.Store({
     "Get_Investors"(state) {
         return state.investors
     },
+    "Get_Investor"(state) {
+        return state.investor
+    },
     "Get_Investments"(state) {
       if (state.investments !== null) {
         return state.investments
@@ -119,6 +123,9 @@ export default new Vuex.Store({
     },
     "Set_Investors"(state, investors) {
       state.investors = investors
+    },
+    "Set_Investor"(state, investor) {
+      state.investor = investor
     },
     "Set_Investments"(state, investments) {
       state.investments = investments
@@ -227,12 +234,11 @@ export default new Vuex.Store({
       .then(res => res.json())
       .then(resp => {
         if(resp.status == 1){
-          console.log(resp)
-        commit("Set_Investors", resp.data)
-        commit("Set_Loading", {type:"investors", value:false})
+          commit("Set_Investors", resp.data)
+          commit("Set_Loading", {type:"investors", value:false})
       }else {
-        console.log(resp)
-        commit("Set_Loading", {type:"investors", value:false})
+          console.log(resp)
+          commit("Set_Loading", {type:"investors", value:false})
         }
 
       }).catch(err => {
@@ -241,6 +247,56 @@ export default new Vuex.Store({
       })
     },
 
+    async getInvestor({commit}, id){
+
+      commit("Set_Loading", {type:"investor", value:true})
+      const token = localStorage.getItem('userToken')
+
+      await await fetch(`https://bbdms.herokuapp.com/api/investor/${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token} `,
+        }
+      })
+      .then(res => res.json())
+      .then(resp => {
+        if(resp.status == 1){
+          commit("Set_Investor", resp.data)
+          commit("Set_Loading", {type:"investor", value:false})
+      }else {
+          console.log(resp)
+          commit("Set_Loading", {type:"investor", value:false})
+        }
+      })
+    },
+
+    async updateInvestor({commit}, investor){
+
+      commit("Set_Loading", {type:"update", value:true})
+
+      const token = localStorage.getItem('userToken')
+
+      await await fetch(`https://bbdms.herokuapp.com/api/investor/${investor.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token} `,
+        },
+        body: JSON.stringify(investor)
+
+      })
+      .then(res => res.json())
+      .then(resp => {
+        console.log(resp.data);
+        commit("Set_Loading", {type:"update", value:false})
+      })
+      .catch(err => {
+        commit("Set_Loading", {type:"update", value:false})
+        console.log(err);
+      })
+
+    },
     authenticated({commit, dispatch}, path){
       const token = localStorage.getItem('userToken')
       if(token){

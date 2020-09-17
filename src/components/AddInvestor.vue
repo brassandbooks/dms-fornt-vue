@@ -15,21 +15,22 @@
                         <v-container>
                             <v-row no-gutters>
                                 <v-col cols="12" class="d-flex error--text align-center justify-end">Investor with email already exist</v-col>
-                                <v-col cols="12">
+                                <v-col cols="12" sm="6">
                                     <v-text-field type="text" prepend-icon="mdi-account" v-model="firstName" label="First Name"></v-text-field>
                                 </v-col>
-                                <v-col cols="12">
+                                <v-col cols="12" sm="6">
                                     <v-text-field type="text" prepend-icon="mdi-account" v-model="lastName" label="Last Name"></v-text-field>
                                 </v-col>
-                                <v-col cols="12">
+                                <v-col cols="12" sm="6">
                                     <v-text-field type="text" prepend-icon="mdi-account" v-model="otherName" label="Other Name"></v-text-field>
                                 </v-col>
-                                <v-col cols="12">
-                                    <v-text-field type="email" prepend-icon="mdi-email" v-model="email" label="Email"></v-text-field>
-                                </v-col>
-                                <v-col cols="12">
+                                <v-col cols="12" sm="6">
                                     <v-text-field type="text" prepend-icon="mdi-phone" v-model="phoneNumber" label="Phone Number"></v-text-field>
                                 </v-col>
+                                <v-col cols="12" >
+                                    <v-text-field type="email" prepend-icon="mdi-email" v-model="email" label="Email"></v-text-field>
+                                </v-col>
+                                
                                 <v-col cols="12" class="d-flex justify-end">
                                     <v-spacer></v-spacer>
                                     <v-btn color="primary" text @click="close">Cancel</v-btn>

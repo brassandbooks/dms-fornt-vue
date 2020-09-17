@@ -6,30 +6,31 @@
                 <v-card>
                     <v-card-title class="primary--text pt-6 ">
                         <v-icon large color="primary" class="mr-4">
-                            mdi-account-plus
+                            mdi-cash-check
                         </v-icon>
-                        <span class="headline">Add New Investors</span>
+                        <span class="headline">Add New Investments</span>
                     </v-card-title>
 
                     <v-card-text>
                         <v-container>
                             <v-row no-gutters>
                                 <v-col cols="12" class="d-flex error--text align-center justify-end">Investor with email already exist</v-col>
-                                <v-col cols="12">
-                                    <v-text-field type="text" prepend-icon="mdi-account" v-model="firstName" label="First Name"></v-text-field>
+                                <v-col cols="12" sm="6">
+                                    <v-text-field type="text" prepend-icon="mdi-account" v-model="principalSum" label="Principal Sum"></v-text-field>
+                                </v-col>
+                                <v-col cols="12" sm="6">
+                                    <v-text-field type="text" prepend-icon="mdi-account" v-model="interestRate" label="Interest Rate"></v-text-field>
+                                </v-col>
+                                <v-col cols="12" sm="6">
+                                    <v-text-field type="text" prepend-icon="mdi-account" v-model="investmentDuration" label="Investment Duration"></v-text-field>
+                                </v-col>
+                                <v-col cols="12" sm="6">
+                                    <v-text-field type="email" prepend-icon="mdi-email" v-model="distributionDate" label="Distribution Date"></v-text-field>
                                 </v-col>
                                 <v-col cols="12">
-                                    <v-text-field type="text" prepend-icon="mdi-account" v-model="lastName" label="Last Name"></v-text-field>
+                                    <v-select :items="payoutFrequency" label="Payout Frequency"></v-select>
                                 </v-col>
-                                <v-col cols="12">
-                                    <v-text-field type="text" prepend-icon="mdi-account" v-model="otherName" label="Other Name"></v-text-field>
-                                </v-col>
-                                <v-col cols="12">
-                                    <v-text-field type="email" prepend-icon="mdi-email" v-model="email" label="Email"></v-text-field>
-                                </v-col>
-                                <v-col cols="12">
-                                    <v-text-field type="text" prepend-icon="mdi-phone" v-model="phoneNumber" label="Phone Number"></v-text-field>
-                                </v-col>
+                                
                                 <v-col cols="12" class="d-flex justify-end">
                                     <v-spacer></v-spacer>
                                     <v-btn color="primary" text @click="close">Cancel</v-btn>
@@ -53,11 +54,14 @@ export default {
         toggle: Function
     },
     data: () => ({
-        firstName: "",
-        lastName: "",
-        otherName: "",
-        email: "",
-        phoneNumber: ""
+        principalSum: "",
+        interestRate: "",
+        ffectiveDate: "",
+        investmentDuration: "",
+        distributionDate: "",
+        payoutFrequency: [
+            'Monthly', 'Biannually', 'Quarterly', 'Annually'
+        ]
 
     }),
     methods: {
@@ -76,15 +80,15 @@ export default {
 
 </style>
 
-// principalSum, 
-// interestRate, 
-// effectiveDate, 
-// investmentDuration, 
-// distributionDate, 
-// payoutFrequency (
-//     monthly -1, 
-//     quarterly - 3, 
-//     biannually - 6, 
-//     annually - 12
-//     ), 
-// investor ID
+principalSum, 
+interestRate, 
+effectiveDate, 
+investmentDuration, 
+distributionDate, 
+payoutFrequency (
+    monthly -1, 
+    quarterly - 3, 
+    biannually - 6, 
+    annually - 12
+    ), 
+investor ID

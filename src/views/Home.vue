@@ -102,8 +102,7 @@ created(){
         },
 
         viewInvestor(investor){
-            console.log(investor._id)
-            this.$router.push(`/investors/${investor._id}`)
+            this.$router.push(`/investor/${investor._id}`)
         }
 
     },

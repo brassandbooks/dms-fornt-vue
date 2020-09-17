@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
-import Investor from '../components/Investor.vue'
+import Investor from '../views/Investor.vue'
 
 
 Vue.use(VueRouter)

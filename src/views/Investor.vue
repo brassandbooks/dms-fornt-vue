@@ -1,5 +1,28 @@
 <template>
-<v-container>
+<v-container >
+    
+    <div v-if="investor !== null">
+        <v-snackbar
+        top
+        centered
+        dark
+        :color="alert.type"
+      v-model="alert.is"
+    >
+      {{ alert.text }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn
+          color="primary"
+          text
+          v-bind="attrs"
+          @click="setAlert(false)"
+        >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
+
     <v-row no-gutters>
         <v-col cols="12" class="py-2 d-flex justify-space-between">
             <v-btn to="/" text depressed color="primary" class="mb-2">
@@ -12,7 +35,7 @@
         <v-col cols="12">
             <v-card class="px-3">
                 <v-card-title class=" text-subtitle-1">
-                    Peter Emmanuel Whyte
+                    {{`${investor.firstName} ${investor.lastName} ${investor.otherNames}`}}
                     <v-divider class="mx-4" inset vertical></v-divider>
                     <v-spacer></v-spacer>
                     <div>
@@ -30,11 +53,11 @@
                                     <div class="d-flex flex-column flex-md-row">
                                         <div class="mr-4">
                                             <span class="font-weight-medium">Email:</span>
-                                            peteremmanuelwhyte@gmail.com
+                                            {{investor.email}}
                                         </div>
                                         <div>
                                             <span class="font-weight-medium">Phone Number:</span>
-                                            08108139758
+                                            {{investor.phoneNumber}}
                                         </div>
                                     </div>
                                 </v-col>
@@ -53,21 +76,31 @@
             </v-card>
         </v-col>
     </v-row>
-    <v-row>
+    
+    <v-row >
         <investments />
     </v-row>
-    <v-row>
+    <v-row >
     <add-investment :dialog="dialog" :toggle="toggle"/>
     </v-row>
-    <v-row>
+    <v-row >
     <edit-investor :investor="investor" :dialog="dialog" :toggle="toggle"/>
+    </v-row>
+
+    </div>
+    <v-row justify="center" align="center" style="height:100vh" v-if="investor === null">
+         <v-progress-circular
+         :size="50"
+      indeterminate
+      color="primary"
+    ></v-progress-circular>
     </v-row>
 </v-container>
 </template>
 
 <script>
 import {
-    mapGetters
+    mapGetters, mapActions
 } from 'vuex'
 import Investments from '../components/Investments'
 import AddInvestment from '../components/AddInvestment'
@@ -82,31 +115,27 @@ export default {
     },
 
     data: () => ({
-        investor: {
-        id: 1,
-        name: 'Peter Emmanuel Whyte',
-        email: 'peteremmanuelwhyte@gmail.com',
-        phone: '08108139758',
-        numberOfInvestments: 7
-        },
         dialog: {
             invest: false,
             edit:false
-        }
+        },
+       
     }),
     computed: {
-        ...mapGetters({
-            totalInvestments: 'Get_TotalInvestments'
+        ...mapGetters({alert:"Get_Alert",
+            totalInvestments: 'Get_TotalInvestments', investor:"Get_Investor"
         }),
 
     },
     created(){
-        console.log(this.$route.params)
+        this.getInvestor(this.$route.params.id)
     },
     methods: {
+        ...mapActions(['getInvestor']),
         toggle(par, which){
             this.dialog[which] = par
-        }
+        },
+
     }
 }
 </script>

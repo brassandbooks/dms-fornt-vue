@@ -25,7 +25,7 @@
                                     <v-text-field type="text" prepend-icon="mdi-account" v-model="lastName" label="Last Name"></v-text-field>
                                 </v-col>
                                 <v-col cols="12">
-                                    <v-text-field type="text" prepend-icon="mdi-account" v-model="otherName" label="Other Name"></v-text-field>
+                                    <v-text-field type="text" prepend-icon="mdi-account" v-model="otherNames" label="Other Names"></v-text-field>
                                 </v-col>
                                 <v-col cols="12">
                                     <v-text-field type="email" prepend-icon="mdi-email" v-model="email" label="Email"></v-text-field>
@@ -36,7 +36,7 @@
                                 <v-col cols="12" class="d-flex justify-end">
                                     <v-spacer></v-spacer>
                                     <v-btn color="primary" text @click="close">Cancel</v-btn>
-                                    <v-btn  color="primary" depressed @click="save">Save</v-btn>
+                                    <v-btn  color="primary" :loading="loading.update" depressed @click="save">Save</v-btn>
                                 </v-col>
                             </v-row>
                         </v-container>
@@ -50,6 +50,7 @@
 </template>
 
 <script>
+import {mapActions, mapGetters} from 'vuex'
 export default {
     name:"EditInvestor",
     props: {
@@ -60,17 +61,29 @@ export default {
     data: () => ({
         firstName: "",
         lastName: "",
-        otherName: "",
+        otherNames: "",
         email: "",
         phoneNumber: ""
 
     }),
+    computed:{
+        ...mapGetters({loading:"Get_Loading"})
+    },
     methods: {
+        ...mapActions({update: "updateInvestor"}),
         close() {
             this.toggle(false, "edit")
         },
         save() {
-            console.log('save');
+            const newInvestor = {
+                firstName : this.firstName,
+                lastName: this.lastName,
+                otherNames: this.otherNames,
+                email: this.email,
+                phoneNumber : this.phoneNumber,
+                id : this.investor.id
+            }
+            this.update(newInvestor)
         }
 
     }
