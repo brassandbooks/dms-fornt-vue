@@ -16,7 +16,7 @@
           color="primary"
           text
           v-bind="attrs"
-          @click="setAlert(false)"
+          @click="closeAlert"
         >
           Close
         </v-btn>
@@ -30,7 +30,7 @@
                 Go Back
             </v-btn>
 
-     <v-btn  color="primary secondary--text " dark class="mb-2"   @click.stop="toggle(true, 'invest')" >New Investment</v-btn>
+     <v-btn  color="primary secondary--text " dark class="mb-2"   @click.stop="toggle(true, 'investment')" >New Investment</v-btn>
         </v-col>
         <v-col cols="12">
             <v-card class="px-3">
@@ -63,7 +63,7 @@
                                 </v-col>
                                 <v-col cols="2" class="d-flex align-center justify-end" >
                                     
-                                    <v-btn  @click.stop="toggle(true, 'edit')" outlined depressed color="primary">
+                                    <v-btn  @click.stop="toggle(true, 'update')" outlined depressed color="primary">
                                         Edit
                                     </v-btn>
                                 </v-col>
@@ -100,7 +100,7 @@
 
 <script>
 import {
-    mapGetters, mapActions
+    mapGetters, mapActions, mapMutations
 } from 'vuex'
 import Investments from '../components/Investments'
 import AddInvestment from '../components/AddInvestment'
@@ -115,14 +115,10 @@ export default {
     },
 
     data: () => ({
-        dialog: {
-            invest: false,
-            edit:false
-        },
        
     }),
     computed: {
-        ...mapGetters({alert:"Get_Alert",
+        ...mapGetters({alert:"Get_Alert", dialog:"Get_Dialog",
             totalInvestments: 'Get_TotalInvestments', investor:"Get_Investor"
         }),
 
@@ -131,10 +127,16 @@ export default {
         this.getInvestor(this.$route.params.id)
     },
     methods: {
+        ...mapMutations({setAlert :"Set_Alert", setDialog:"Set_Dialog"}),
         ...mapActions(['getInvestor']),
-        toggle(par, which){
-            this.dialog[which] = par
+
+        toggle(value, type){
+            this.setDialog({type, value})
         },
+        closeAlert(){
+            this.setAlert({is:false, type:"", text:""})
+        }
+            
 
     }
 }
