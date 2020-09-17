@@ -42,12 +42,12 @@
          
         </v-btn>
       </template>
-      <v-list>
+      <v-list class="py-0">
         <v-list-item
 
          @click="logout"
         > <v-list-item-icon>    
-         <v-icon color="primary" class="px-0">
+         <v-icon color="primary" class="pa-0">
            mdi-logout
          </v-icon>
         </v-list-item-icon>

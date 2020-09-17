@@ -1,7 +1,6 @@
 <template>
 <v-container >
     
-    <div v-if="investor !== null">
         <v-snackbar
         top
         centered
@@ -22,6 +21,7 @@
         </v-btn>
       </template>
     </v-snackbar>
+    <div v-if="investor !== null">
 
     <v-row no-gutters>
         <v-col cols="12" class="py-2 d-flex justify-space-between">
