@@ -2,7 +2,7 @@
 <v-container>
     <v-row>
         <v-col cols="12">
-            <v-dialog persistent v-model="dialog.edit" max-width="500px">
+            <v-dialog persistent v-model="dialog.update" max-width="500px">
                 <v-card>
                     <v-card-title class="primary--text pt-6 ">
                         <v-icon large color="primary" class="mr-4">
@@ -11,35 +11,35 @@
                         <span class="headline">Edit Account</span>
 
                         <v-spacer></v-spacer>
-                        <span class="text-caption">Peter Emmanuel Whyte</span>
+
                     </v-card-title>
 
                     <v-card-text>
-                        <v-container>
+                        <v-form ref="form" v-model="valid" :lazy-validation="lazy">
                             <v-row no-gutters>
-                                <v-col cols="12" class="d-flex error--text align-center justify-end">Investor with email already exist</v-col>
-                                <v-col cols="12">
-                                    <v-text-field type="text" prepend-icon="mdi-account" v-model="firstName" label="First Name"></v-text-field>
+                                <v-col cols="12" class="d-flex error--text align-center justify-end">{{errorMessage}}</v-col>
+                                <v-col cols="12" >
+                                    <v-text-field type="text" prepend-icon="mdi-account" v-model="firstName" :rules="nameRules" label="First Name"></v-text-field>
+                                </v-col>
+                                <v-col cols="12" >
+                                    <v-text-field type="text" prepend-icon="mdi-account" v-model="lastName" :rules="nameRules" label="Last Name"></v-text-field>
+                                </v-col>
+                                <v-col cols="12" >
+                                    <v-text-field type="text" prepend-icon="mdi-account" v-model="otherNames" label="Other Names"></v-text-field>
                                 </v-col>
                                 <v-col cols="12">
-                                    <v-text-field type="text" prepend-icon="mdi-account" v-model="lastName" label="Last Name"></v-text-field>
+                                    <v-text-field type="email" prepend-icon="mdi-email" v-model="email" :rules="emailRules" label="Email"></v-text-field>
                                 </v-col>
-                                <v-col cols="12">
-                                    <v-text-field type="text" prepend-icon="mdi-account" v-model="otherName" label="Other Name"></v-text-field>
-                                </v-col>
-                                <v-col cols="12">
-                                    <v-text-field type="email" prepend-icon="mdi-email" v-model="email" label="Email"></v-text-field>
-                                </v-col>
-                                <v-col cols="12">
-                                    <v-text-field type="text" prepend-icon="mdi-phone" v-model="phoneNumber" label="Phone Number"></v-text-field>
+                                <v-col cols="12" >
+                                    <v-text-field type="text" prepend-icon="mdi-phone" v-model="phoneNumber" :rules="phoneRules" label="Phone Number"></v-text-field>
                                 </v-col>
                                 <v-col cols="12" class="d-flex justify-end">
                                     <v-spacer></v-spacer>
                                     <v-btn color="primary" text @click="close">Cancel</v-btn>
-                                    <v-btn  color="primary" depressed @click="save">Save</v-btn>
+                                    <v-btn color="primary" :loading="loading.update" depressed @click="save">Update</v-btn>
                                 </v-col>
                             </v-row>
-                        </v-container>
+                        </v-form>
                     </v-card-text>
 
                 </v-card>
@@ -50,28 +50,78 @@
 </template>
 
 <script>
+import {
+    mapActions,
+    mapGetters
+} from 'vuex'
 export default {
-    name:"EditInvestor",
+    name: "EditInvestor",
     props: {
-        investor:Object,
+        investor: Object,
         dialog: Object,
         toggle: Function
     },
     data: () => ({
+        valid: true,
+        lazy: false,
+        errorMessage: "",
         firstName: "",
         lastName: "",
-        otherName: "",
+        otherNames: "",
         email: "",
-        phoneNumber: ""
+        phoneNumber: "",
+
+        nameRules: [
+            v => !!v || 'Name is required',
+        ],
+
+        phoneRules: [
+            v => !!v || 'Phone Number is required',
+            v => /[0]\d{10}$/.test(v) || 'Phone Number must be valid',
+        ],
+        emailRules: [
+            v => !!v || 'E-mail is required',
+            v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
+        ],
 
     }),
+    computed: {
+        ...mapGetters({
+            loading: "Get_Loading"
+        })
+    },
     methods: {
+        ...mapActions({
+            update: "updateInvestor"
+        }),
         close() {
-            this.toggle(false, "edit")
+            this.toggle(false, "update")
+            this.reset()
+            this.resetValidation()
         },
         save() {
-            console.log('save');
-        }
+            if (this.$refs.form.validate()) {
+                const newInvestor = {
+                    firstName: this.firstName,
+                    lastName: this.lastName,
+                    otherNames: this.otherNames,
+                    email: this.email,
+                    phoneNumber: this.phoneNumber,
+                    id: this.investor.id
+                }
+
+                this.update(newInvestor)
+
+            }
+
+        },
+
+        reset() {
+            this.$refs.form.reset()
+        },
+        resetValidation() {
+            this.$refs.form.resetValidation()
+        },
 
     }
 }
