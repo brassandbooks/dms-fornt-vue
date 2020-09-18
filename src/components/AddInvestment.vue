@@ -8,7 +8,7 @@
                         <v-icon large color="primary" class="mr-4">
                             mdi-cash-check
                         </v-icon>
-                        <span class="headline">Add New Investments</span>
+                        <span class="headline">Add New Investment</span>
                     </v-card-title>
 
                     <v-card-text>

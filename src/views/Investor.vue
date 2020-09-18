@@ -21,8 +21,8 @@
         </v-btn>
       </template>
     </v-snackbar>
-    <div v-if="investor !== null">
 
+    <div v-if="investor !== null">
     <v-row no-gutters>
         <v-col cols="12" class="py-2 d-flex justify-space-between">
             <v-btn to="/" text depressed color="primary" class="mb-2">

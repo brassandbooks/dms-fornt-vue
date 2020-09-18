@@ -12,6 +12,7 @@ export default new Vuex.Store({
     },
 
     loading: {
+      
       add: false,
       update: false,
       login: false,
@@ -19,6 +20,7 @@ export default new Vuex.Store({
     },
 
     dialog: {
+      view:false,
       update: false,
       investor: false,
       investment: false
@@ -43,28 +45,40 @@ export default new Vuex.Store({
 
     investments: [
       {
-        capital: 200000,
-        payoutDate: "10-Nov-2020",
+        principalSum: 200000,
+        distributionDate: "19-Aug-2020",
         expiringDate: "12-June-2021",
         interestRate: 2.5,
+        effectiveDate:"12-June-2020",
+        payoutFrequency:'Monthly',
+        investorID:"adfasdfaoi2308230asfo80430",
       },
       {
-        capital: 200000,
-        payoutDate: "10-Nov-2020",
+        principalSum: 100000,
+        distributionDate: "5-Jan-2021",
         expiringDate: "12-June-2021",
-        interestRate: 2.5,
+        interestRate: 2,
+        effectiveDate:"12-June-2020",
+        payoutFrequency:'Monthly',
+        investorID:"adfasdfaoi2308230asfo80430",
       },
       {
-        capital: 200000,
-        payoutDate: "10-Nov-2020",
-        expiringDate: "12-June-2021",
-        interestRate: 2.5,
+        principalSum: 1000000,
+        distributionDate: "10-Nov-2020",
+        expiringDate: "12-Nov-2021",
+        interestRate: 3,
+        effectiveDate:"12-Nov-2020",
+        payoutFrequency:'Monthly',
+        investorID:"adfasdfaoi2308230asfo80430",
       },
       {
-        capital: 200000,
-        payoutDate: "10-Nov-2020",
+        principalSum: 500000,
+        distributionDate: "1-Nov-2020",
         expiringDate: "12-June-2021",
         interestRate: 2.5,
+        effectiveDate:"12-June-2020",
+        payoutFrequency:'Monthly',
+        investorID:"adfasdfaoi2308230asfo80430",
       },
     ]
 

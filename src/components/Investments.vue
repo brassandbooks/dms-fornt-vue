@@ -1,8 +1,8 @@
 <template>
 <v-container>
-    <v-row justify="center">
+    <v-row v-if="!showViewed" justify="center">
         <v-col cols="12">
-            <v-data-table :search="search"   loading-text="Loading... Please wait" :headers="headers" :items="investments" sort-by="calories" class="elevation-1">
+            <v-data-table :search="search" loading-text="Loading... Please wait" :headers="headers" :items="investments" sort-by="calories" class="elevation-1">
                 <template v-slot:top>
                     <v-toolbar flat color="white">
                         <v-toolbar-title>INVESTMENTS</v-toolbar-title>
@@ -20,7 +20,9 @@
                 </template>
             </v-data-table>
         </v-col>
-
+    </v-row>
+    <v-row v-else>
+        <view-investment :investment="viewedInvestment" :toggleView="toggleView" />
     </v-row>
 
 </v-container>
@@ -28,39 +30,34 @@
 
 <script>
 // @ is an alias to /src
+import ViewInvestment from './ViewInvestment'
 import {
     mapGetters
 } from 'vuex'
 
 export default {
     name: 'Investments',
-    // filters: {
-    //     currency(val) {
-    //         if (val) {
-    //             return val.toLocaleString()
-    //         } else {
 
-    //         }
-    //     }
-    // },
+    components: {
+        ViewInvestment
+    },
     data: () => ({
-        dialog: false,
-        loading: false,
-
+        showViewed:false,
+        viewedInvestment: {},
         search: '',
         headers: [{
-                text: 'Capital',
+                text: 'Principal Sum',
                 align: 'start',
                 sortable: false,
-                value: 'capital',
+                value: 'principalSum',
             },
             {
                 text: 'Interest Rate',
                 value: 'interestRate'
             },
             {
-                text: 'Payout Date',
-                value: 'payoutDate'
+                text: 'Distribution Date',
+                value: 'distributionDate'
             },
             {
                 text: 'Expiring Date',
@@ -82,17 +79,33 @@ export default {
         }),
         investments() {
             this.allInvestments.forEach(el => {
-               let formatedCapital = el.capital.toLocaleString()
-               el.interestRate = `${el.interestRate}%`
-                el.capital = formatedCapital
+                let formatedCapital = el.principalSum.toLocaleString()
+                el.principalSum = formatedCapital
             })
             return this.allInvestments
         }
     },
 
     methods: {
+        view(item){
+            this.viewedInvestment = item
+            this.toggleView(true)
+        },
 
+        toggleView(on){
+            this.showViewed = on
+        }
     },
 
 }
 </script>
+
+    // filters: {
+    //     currency(val) {
+    //         if (val) {
+    //             return val.toLocaleString()
+    //         } else {
+
+    //         }
+    //     }
+    // },

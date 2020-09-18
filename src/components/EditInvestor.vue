@@ -11,7 +11,7 @@
                         <span class="headline">Edit Account</span>
 
                         <v-spacer></v-spacer>
-                        <span class="text-caption">Peter Emmanuel Whyte</span>
+
                     </v-card-title>
 
                     <v-card-text>
