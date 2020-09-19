@@ -12,11 +12,7 @@
     </v-snackbar>
     <v-row justify="center">
         <v-col cols="12" class="py-0 d-flex justify-space-between">
-            <div>
-                <v-btn :outlined="!all" :color="all ? 'primary secondary--text' : 'primary'" depressed class="mr-2" @click="init('all')">All</v-btn>
-                <v-btn :outlined="all" :color="!all ? 'primary secondary--text' : 'primary'" depressed @click="init('due')">Due for payment</v-btn>
-            </div>
-
+            <v-spacer></v-spacer>
             <v-btn depressed color="primary secondary--text" dark class="mb-2" @click.stop="toggle(true, 'investor')">New Investors</v-btn>
         </v-col>
         <v-col cols="12">
@@ -62,7 +58,6 @@ export default {
         AddInvestor
     },
     data: () => ({
-        all: true,
         search: '',
         headers: [{
                 text: 'Name',
@@ -81,10 +76,6 @@ export default {
             {
                 text: 'Phone Number',
                 value: 'phoneNumber'
-            },
-            {
-                text: 'No. of Investment',
-                value: 'numberOfInvestments'
             },
 
             {
@@ -115,14 +106,6 @@ export default {
             setDialog: "Set_Dialog"
         }),
 
-        init(arg){
-            if(arg  === 'all'){
-                this.all = true
-
-            }else if(arg === 'due') {
-                this.all = false
-            }
-        },
 
         toggle(value, type) {
             this.setDialog({

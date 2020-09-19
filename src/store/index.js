@@ -14,9 +14,12 @@ export default new Vuex.Store({
     loading: {
       
       add: false,
+      addInvestment: false,
       update: false,
       login: false,
       investors: false,
+      investments: false,
+      singleInvestment:false,
     },
 
     dialog: {
@@ -39,57 +42,18 @@ export default new Vuex.Store({
     },
 
     user: null,
-
     investors: [],
     investor: null,
-
-    investments: [
-      {
-        principalSum: 200000,
-        distributionDate: "19-Aug-2020",
-        expiringDate: "12-June-2021",
-        interestRate: 2.5,
-        effectiveDate:"12-June-2020",
-        payoutFrequency:'Monthly',
-        investorID:"adfasdfaoi2308230asfo80430",
-      },
-      {
-        principalSum: 100000,
-        distributionDate: "5-Jan-2021",
-        expiringDate: "12-June-2021",
-        interestRate: 2,
-        effectiveDate:"12-June-2020",
-        payoutFrequency:'Monthly',
-        investorID:"adfasdfaoi2308230asfo80430",
-      },
-      {
-        principalSum: 1000000,
-        distributionDate: "10-Nov-2020",
-        expiringDate: "12-Nov-2021",
-        interestRate: 3,
-        effectiveDate:"12-Nov-2020",
-        payoutFrequency:'Monthly',
-        investorID:"adfasdfaoi2308230asfo80430",
-      },
-      {
-        principalSum: 500000,
-        distributionDate: "1-Nov-2020",
-        expiringDate: "12-June-2021",
-        interestRate: 2.5,
-        effectiveDate:"12-June-2020",
-        payoutFrequency:'Monthly',
-        investorID:"adfasdfaoi2308230asfo80430",
-      },
-    ]
+    investments: [],
+    investment: [],
+    banks: []
 
   },
   getters: {
-    "Get_TotalInvestments"(state) {
-      if (state.investments) {
-        return state.investments.length
-      } else {
-        return 0
-      }
+
+
+    "Get_Banks"(state) {
+      return state.banks
     },
     "Get_User"(state) {
       return state.user
@@ -117,11 +81,10 @@ export default new Vuex.Store({
       return state.investor
     },
     "Get_Investments"(state) {
-      if (state.investments !== null) {
-        return state.investments
-      } else {
-        return []
-      }
+     return state.investments
+    },
+    "Get_Investment"(state) {
+     return state.investment
     }
   },
   mutations: {
@@ -142,6 +105,9 @@ export default new Vuex.Store({
     "Set_Loading"(state, params) {
       state.loading[params.type] = params.value
     },
+    "Set_Banks"(state, banks) {
+      state.banks = banks
+    },
     "Set_User"(state, user) {
       state.user = user
     },
@@ -153,10 +119,14 @@ export default new Vuex.Store({
     },
     "Set_Investments"(state, investments) {
       state.investments = investments
+    },
+    "Set_Investment"(state, investment) {
+      state.investment = investment
     }
   },
   actions: {
 
+  
     "Init_Alert"({ commit }, alert) {
       let time
       alert.time ? time = alert.time : time = 5
@@ -176,6 +146,27 @@ export default new Vuex.Store({
         commit("Set_Toast", { is: false, type: "", text: "" })
       }, 5000)
 
+    },
+    
+    async  callBanks({commit}){
+      await fetch("https://api.paystack.co/bank", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        
+      })
+      .then(res => res.json())
+      .then(resp => {
+        let banks = []
+        resp.data.forEach(bank => {
+          banks.push(bank.name)
+        })
+        commit("Set_Banks", banks)
+      })
+      .catch(err => {
+        console.log(err);
+      })
     },
 
     async "Login_User"({ commit, dispatch }, user) {
@@ -210,7 +201,7 @@ export default new Vuex.Store({
             router.push('/')
 
           } else {
-            console.log(resp);
+            
             commit("Set_Loading", { type: "login", value: false })
             dispatch("Init_Alert", { type: "error", text: resp.message })
           }
@@ -246,8 +237,7 @@ export default new Vuex.Store({
             commit("Set_Investors", resp.data)
             commit("Set_Loading", { type: "investors", value: false })
           } else {
-            console.log(resp)
-            commit("Set_Loading", { type: "investors", value: false })
+                        commit("Set_Loading", { type: "investors", value: false })
           }
 
         }).catch(err => {
@@ -257,8 +247,78 @@ export default new Vuex.Store({
         })
     },
 
+    async initInvestments({ commit, dispatch }, date) {
+      let api
+      date ? api = `https://bbdms.herokuapp.com/api/investment/search/${date.year}/${date.month}/${date.day}` : api = "https://bbdms.herokuapp.com/api/investment"
+
+      commit("Set_Loading", { type: "investments", value: true })
+      const token = localStorage.getItem('userToken')
+
+      await await fetch(api, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token} `,
+        },
+      })
+        .then(res => res.json())
+        .then(resp => {
+          if (resp.status == 1) {
+            commit("Set_Investments", resp.data)
+            commit("Set_Loading", { type: "investments", value: false })
+
+            if(date && !resp.data.length){
+              dispatch("Init_Alert", { type: "primary", text:'No Due Investments' })
+            }
+
+          } else {
+            commit("Set_Loading", { type: "investments", value: false })
+          }
+
+        }).catch(err => {
+          console.log(err);
+          commit("Set_Loading", { type: "investments", value: false })
+          dispatch("Init_Alert", { time:6, type: "primary", text: `${err.message}, make sure your have internet connection` })
+        })
+    },
+
+    async addInvestment({commit, dispatch}, investment){
+      
+
+      commit("Set_Loading", { type: "addInvestment", value: true })
+      const token = localStorage.getItem('userToken')
+
+      await await fetch('https://bbdms.herokuapp.com/api/investment/', {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token} `,
+        },
+        body: JSON.stringify(investment)
+      })
+        .then(res => res.json())
+        .then(resp => {
+          if(resp.status === 1){
+            console.log(resp.data);
+             commit("Set_Loading", { type: "addInvestment", value: false })
+             commit("Set_Dialog", { type: "investment", value: false })
+              dispatch("Init_Alert", { type: "success", text: resp.message })
+          }else {
+            
+             commit("Set_Loading", { type: "addInvestment", value: false })
+              dispatch("Init_Alert", { type: "success", text: resp.message })
+          }
+        }).catch(err => {
+          console.log(err);
+           commit("Set_Loading", { type: "addInvestment", value: false })
+            dispatch("Init_Alert", { type: "success", text: err })
+        })
+    },
+
+
     async addInvestor({commit, dispatch}, investor){
       
+      console.log(investor);
       commit("Set_Loading", { type: "add", value: true })
       const token = localStorage.getItem('userToken')
 
@@ -273,11 +333,13 @@ export default new Vuex.Store({
         .then(res => res.json())
         .then(resp => {
           if(resp.status == 1){
-            
+            console.log(resp);
             dispatch("Init_Alert", { type: "success", text: resp.message })
             commit("Set_Dialog", { type: "investor", value: false })
             commit("Set_Loading", { type: "add", value: false })
+            dispatch("initInvestors")
           }else {
+            console.log(resp);
             dispatch("Init_Alert", { type: "error", text: resp.message })
             commit("Set_Loading", { type: "add", value: false })
           }
@@ -305,6 +367,7 @@ export default new Vuex.Store({
           if (resp.status == 1) {
             commit("Set_Investor", resp.data)
             commit("Set_Loading", { type: "investor", value: false })
+           
           } else {
             console.log(resp)
             commit("Set_Loading", { type: "investor", value: false })
@@ -315,7 +378,34 @@ export default new Vuex.Store({
           }
         })
     },
+    async getInvestment({ commit, dispatch }, id) {
 
+      commit("Set_Loading", { type: "singleInvestment", value: true })
+      const token = localStorage.getItem('userToken')
+
+      await await fetch(`https://bbdms.herokuapp.com/api/investment/investor/${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token} `,
+        }
+      })
+        .then(res => res.json())
+        .then(resp => {
+          if (resp.status == 1) {
+           
+            commit("Set_Investment", resp.data)
+            commit("Set_Loading", { type: "singleInvestment", value: false })
+           
+          } else {
+            
+            commit("Set_Loading", { type: "singleInvestment", value: false })
+            dispatch("Init_Alert", { type: "primary", text:resp.message })
+
+          }
+        })
+    },
+  
     async updateInvestor({ commit, dispatch }, investor) {
 
       commit("Set_Loading", { type: "update", value: true })
@@ -337,7 +427,9 @@ export default new Vuex.Store({
             commit("Set_Loading", { type: "update", value: false })
             commit("Set_Dialog", { type: "update", value: false })
             dispatch("Init_Alert", { type: "success", text: resp.message })
+            dispatch("initInvestors")
           } else {
+            
             commit("Set_Loading", { type: "update", value: false })
             dispatch("Init_Alert", { type: "error", text: resp.message })
           }

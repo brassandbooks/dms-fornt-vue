@@ -39,14 +39,14 @@
                     <v-divider class="mx-4" inset vertical></v-divider>
                     <v-spacer></v-spacer>
                     <div>
-                        Total Investments <span class="secondary py-1 px-2 rounded font-weight-medium">{{totalInvestments}}</span>
+                        Total Investments <span class="secondary py-1 px-2 rounded font-weight-medium">{{allInvestments.length}}</span>
                     </div>
                 </v-card-title>
                 <v-divider class="mx-4" inset></v-divider>
                 <v-card-text>
                     <v-row>
                         <v-col cols="12" class="pt-0">
-                            <v-row no-gutters justify="space-between" >
+                            <v-row no-gutters justify="space-between" align="start">
                                 <v-col cols="10">
                                     <div class="headline mb-1">Personal</div>
 
@@ -58,6 +58,16 @@
                                         <div>
                                             <span class="font-weight-medium">Phone Number:</span>
                                             {{investor.phoneNumber}}
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-column flex-md-row mt-2">
+                                        <div class="mr-4">
+                                            <span class="font-weight-medium">Bank:</span>
+                                            {{investor.bank}}
+                                        </div>
+                                        <div>
+                                            <span class="font-weight-medium">Account Number:</span>
+                                            {{investor.accountNumber}}
                                         </div>
                                     </div>
                                 </v-col>
@@ -81,7 +91,7 @@
         <investments />
     </v-row>
     <v-row >
-    <add-investment :dialog="dialog" :toggle="toggle"/>
+    <add-investment :investor="investor" :dialog="dialog" :toggle="toggle"/>
     </v-row>
     <v-row >
     <edit-investor :investor="investor" :dialog="dialog" :toggle="toggle"/>
@@ -118,20 +128,24 @@ export default {
        
     }),
     computed: {
-        ...mapGetters({alert:"Get_Alert", dialog:"Get_Dialog",
-            totalInvestments: 'Get_TotalInvestments', investor:"Get_Investor"
+        ...mapGetters({
+            alert:"Get_Alert", dialog:"Get_Dialog",
+            investor:"Get_Investor",
+            allInvestments: 'Get_Investment'
         }),
 
     },
     created(){
         this.getInvestor(this.$route.params.id)
+        this.getInvestment(this.$route.params.id)
     },
     methods: {
         ...mapMutations({setAlert :"Set_Alert", setDialog:"Set_Dialog"}),
-        ...mapActions(['getInvestor']),
+        ...mapActions(['getInvestor', 'getInvestment']),
 
         toggle(value, type){
             this.setDialog({type, value})
+            console.log(this.dialog);
         },
         closeAlert(){
             this.setAlert({is:false, type:"", text:""})
