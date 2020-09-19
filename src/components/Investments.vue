@@ -2,7 +2,7 @@
 <v-container>
     <v-row v-if="!showViewed" justify="center">
         <v-col cols="12">
-            <v-data-table :search="search" loading-text="Loading... Please wait" :headers="headers" :items="investments" sort-by="calories" class="elevation-1">
+            <v-data-table :search="search" :loading="loading.singleInvestment" loading-text="Loading... Please wait" :headers="headers" :items="investments" sort-by="calories" class="elevation-1">
                 <template v-slot:top>
                     <v-toolbar flat color="white">
                         <v-toolbar-title>INVESTMENTS</v-toolbar-title>
@@ -42,7 +42,7 @@ export default {
         ViewInvestment
     },
     data: () => ({
-        showViewed:false,
+        showViewed: false,
         viewedInvestment: {},
         search: '',
         headers: [{
@@ -75,37 +75,45 @@ export default {
 
     computed: {
         ...mapGetters({
-            allInvestments: 'Get_Investments'
+            allInvestments: 'Get_Investment',
+            loading: "Get_Loading"
         }),
         investments() {
-            this.allInvestments.forEach(el => {
-                let formatedCapital = el.principalSum.toLocaleString()
-                el.principalSum = formatedCapital
-            })
-            return this.allInvestments
+            this.allInvestments.forEach((el) => {
+                let name = `${el.investorDetails.firstName} ${el.investorDetails.lastName}`;
+                el.investor = name;
+
+                el.principalSum = el.principalSum.toLocaleString("en-NG", {
+                    style: "currency",
+                    currency: "NGN",
+                });
+
+                el.distributionAmount = el.distributionAmount.toLocaleString("en-NG", {
+                    style: "currency",
+                    currency: "NGN",
+                });
+
+                el.effectiveDate = new Date(el.effectiveDate).toLocaleDateString(
+                    "en-NG"
+                );
+                el.expiringDate = new Date(el.expiringDate).toLocaleDateString("en-NG");
+            });
+
+            return this.allInvestments;
         }
     },
 
     methods: {
-        view(item){
+        view(item) {
+            item.fromInvestor = true
             this.viewedInvestment = item
             this.toggleView(true)
         },
 
-        toggleView(on){
+        toggleView(on) {
             this.showViewed = on
         }
     },
 
 }
 </script>
-
-    // filters: {
-    //     currency(val) {
-    //         if (val) {
-    //             return val.toLocaleString()
-    //         } else {
-
-    //         }
-    //     }
-    // },

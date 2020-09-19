@@ -11,30 +11,37 @@
                         <span class="headline">New Investor</span>
 
                         <v-spacer></v-spacer>
-                        
+
                     </v-card-title>
 
                     <v-card-text>
                         <v-form ref="form" v-model="valid" :lazy-validation="lazy">
                             <v-row no-gutters>
-                                <v-col cols="12" class="d-flex error--text align-center justify-end">{{errorMessage}}</v-col>
-                                <v-col cols="12" >
-                                    <v-text-field type="text" prepend-icon="mdi-account" v-model="firstName" :rules="nameRules" label="First Name"></v-text-field>
-                                </v-col>
-                                <v-col cols="12" >
-                                    <v-text-field type="text" prepend-icon="mdi-account" v-model="lastName" :rules="nameRules" label="Last Name"></v-text-field>
-                                </v-col>
-                                <v-col cols="12" >
-                                    <v-text-field type="text" prepend-icon="mdi-account" v-model="otherNames" label="Other Names"></v-text-field>
-                                </v-col>
-                                <v-col cols="12">
+                                <v-col cols="12" class="text-subtitle-1 mt-4">Personal Details</v-col>
+                                <v-col dense cols="12">
                                     <v-text-field type="email" prepend-icon="mdi-email" v-model="email" :rules="emailRules" label="Email"></v-text-field>
                                 </v-col>
-                                <v-col cols="12" >
+                                <v-col dense cols="12" sm="6">
+                                    <v-text-field type="text" prepend-icon="mdi-account" v-model="firstName" :rules="nameRules" label="First Name"></v-text-field>
+                                </v-col>
+                                <v-col dense cols="12" sm="6">
+                                    <v-text-field type="text" prepend-icon="mdi-account" v-model="lastName" :rules="nameRules" label="Last Name"></v-text-field>
+                                </v-col>
+                                <v-col dense cols="12" sm="6">
+                                    <v-text-field type="text" prepend-icon="mdi-account" v-model="otherNames" label="Other Names"></v-text-field>
+                                </v-col>
+                                <v-col dense cols="12" sm="6">
                                     <v-text-field type="text" prepend-icon="mdi-phone" v-model="phoneNumber" :rules="phoneRules" label="Phone Number"></v-text-field>
                                 </v-col>
-                                
-                                <v-col cols="12" class="d-flex justify-end">
+
+                                <v-col cols="12" class="text-subtitle-1 mt-4">Bank Details</v-col>
+                                <v-col cols="12" sm="6">
+                                    <v-select :items="allBanks" v-model="bank" label="Bank"></v-select>
+                                </v-col>
+                                <v-col dense cols="12" sm="6">
+                                    <v-text-field type="text" prepend-icon="mdi-bank" v-model="accountNumber" :rules="accnumberRules" label="Account Number"></v-text-field>
+                                </v-col>
+                                <v-col cols="12" class=" mt-4 d-flex justify-end">
                                     <v-spacer></v-spacer>
                                     <v-btn color="primary" text @click="close">Cancel</v-btn>
                                     <v-btn color="primary" :loading="loading.add" depressed @click="save">Add Investor</v-btn>
@@ -59,7 +66,7 @@ export default {
     name: "EditInvestor",
 
     props: {
-        dialog:Object,
+        dialog: Object,
         toggle: Function
     },
 
@@ -72,11 +79,18 @@ export default {
         otherNames: "",
         email: "",
         phoneNumber: "",
+        bank: "",
+        accountNumber: "",
 
         nameRules: [
             v => !!v || 'Name is required',
         ],
-
+        bankRules: [
+            v => !!v || 'Account Name is required',
+        ],
+        accnumberRules: [
+            v => !!v || 'Account Numberis required',
+        ],
         phoneRules: [
             v => !!v || 'Phone Number is required',
             v => /[0]\d{10}$/.test(v) || 'Phone Number must be valid',
@@ -89,8 +103,12 @@ export default {
     }),
     computed: {
         ...mapGetters({
-            loading: "Get_Loading"
+            loading: "Get_Loading",
+            allBanks: "Get_Banks"
         })
+    },
+    created() {
+        this.$store.dispatch('callBanks')
     },
     methods: {
         ...mapActions({
@@ -104,15 +122,19 @@ export default {
         },
 
         save() {
+
             if (this.$refs.form.validate()) {
+
                 const newInvestor = {
                     firstName: this.firstName,
                     lastName: this.lastName,
                     otherNames: this.otherNames,
                     email: this.email,
                     phoneNumber: this.phoneNumber,
+                    bank: this.bank,
+                    accountNumber: this.accountNumber
                 }
-
+                console.log(newInvestor);
                 this.add(newInvestor)
             }
 

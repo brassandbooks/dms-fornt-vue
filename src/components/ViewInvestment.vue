@@ -1,46 +1,144 @@
 <template>
   <v-container>
-      <v-row>
+    <v-row>
+
       <v-col cols="12">
-          <v-card>
-              <v-card-title class=" text-subtitle-1">
-                    Investment ID: {{investment.investorID}}
-                  <v-divider  class="mx-4"  vertical></v-divider>
-                  <v-spacer></v-spacer>
-                  <v-btn @click="toggleView(false)"  small outlined color="primary">
-                      <v-icon small class="mr-2 ml-n2">
-                          mdi-close
-                      </v-icon>
-                      close
-                  </v-btn>
-              </v-card-title>
-              <v-divider></v-divider>
-              <v-card-text>
-                 <v-row>
-                     <v-col cols="12" sm="6" class="text-subtitle-1">
-                         Principal Sum: <span class="font-weight-medium">N{{investment.principalSum}}</span>
-                     </v-col>
-                 </v-row>
-              </v-card-text>
-          </v-card>
+        <v-card>
+          <v-card-title  class=" text-subtitle-1 ">
+            <span  class="text-uppercase"  v-if="!investment.fromInvestor">
+            INVESTOR : {{`${investment.investorDetails.firstName} ${investment.investorDetails.lastName}` }}
+            </span>
+            <span class="text-uppercase" v-else >investment</span>
+            <v-divider class="mx-4" vertical></v-divider>
+            <v-spacer></v-spacer>
+            <v-btn @click="toggleView(false)" small outlined color="primary">
+          <v-icon small class="mr-2 ml-n2">
+            mdi-close
+          </v-icon>
+          close
+        </v-btn>
+          </v-card-title>
+          <v-divider></v-divider>
+          <v-card-text>
+            <v-row>
+              <v-col class=" py-0 d-flex justify-space-between">
+                  <div v-if="!investment.fromInvestor" class="d-flex flex-column flex-sm-row ">
+                      <p class="mr-2">Bank: <span class="font-weight-bold ">{{investment.investorDetails.bank}}</span></p>
+                      <p>Acc No. <span class="font-weight-bold">{{investment.investorDetails.accountNumber}}</span></p>
+                  </div>
+                <div>
+                  Effective Date
+                  <span class="font-weight-bold ml-2">{{
+                    investment.effectiveDate
+                  }}</span>
+                </div>
+              </v-col>
+              <v-col cols="12">
+                <v-simple-table>
+                  <template v-slot:default>
+                    <thead>
+                      <tr>
+                        <th class="text-left">Principal Sum</th>
+                        <th class="text-left">Interest Rate</th>
+                        <th class="text-left">Distribution Amount</th>
+                        <th class="text-left">Distribution Date</th>
+                        <th class="text-left">Expiring Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>{{ investment.principalSum }}</td>
+                        <td>{{ investment.interestRate }}</td>
+                        <td>{{ investment.distributionAmount }}</td>
+                        <td>{{ investment.distributionDate }}</td>
+                        <td>{{ investment.expiringDate }}</td>
+                      </tr>
+                    </tbody>
+                  </template>
+                </v-simple-table>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
       </v-col>
-  </v-row>
+    </v-row>
+    <v-row>
+      <v-col cols="12">
+        <v-data-table
+          loading-text="Loading... Please wait"
+          :headers="headers"
+          :items="investment.schedule"
+          sort-by="calories"
+          class="elevation-1"
+        >
+          <template v-slot:top>
+            <v-toolbar flat color="white">
+              <v-toolbar-title>Payment Schedule</v-toolbar-title>
+              <v-divider class="mx-4" inset vertical></v-divider>
+            </v-toolbar>
+          </template>
+          <template v-slot:item.status="{ item }">
+            <v-chip small :color="item.status ? 'success' : 'grey'" dark>{{
+              item.status ? "Paid" : "Not paid"
+            }}</v-chip>
+          </template>
+          <template v-slot:item.actions="{ item }">
+            <v-btn
+              color="primary secondary--text"
+              small
+              depressed
+              :disabled="item.status"
+              @click="pay(item)"
+            >
+              Pay
+            </v-btn>
+          </template>
+        </v-data-table>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
 <script>
 export default {
-    props: {
-        investment: Object,
-        toggleView:Function
-    },
+  props: {
+    investment: Object,
+    toggleView: Function,
+  },
 
-    data :()=>({
+  data: () => ({
+    headers: [
+      {
+        text: "Month",
+        align: "start",
+        sortable: false,
+        value: "month",
+      },
+      {
+        text: "Day",
+        value: "day",
+      },
+      {
+        text: "Year",
+        value: "year",
+      },
+      {
+        text: "Ref No.",
+        value: "ref",
+      },
+      {
+        text: "Status",
+        value: "status",
+      },
 
-    })
-}
+      {
+        text: "Pay",
+        value: "actions",
+        sortable: false,
+      },
+    ],
+  }),
+};
 </script>
 
-<style>
-
-</style>
+<style></style>
