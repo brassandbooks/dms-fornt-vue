@@ -12,6 +12,10 @@
     </v-snackbar>
     <v-row justify="center">
         <v-col cols="12" class="py-0 d-flex justify-space-between">
+              <v-btn @click="refresh" text color="primary">
+              <v-icon>mdi-autorenew</v-icon>
+              Refresh
+            </v-btn>
             <v-spacer></v-spacer>
             <v-btn depressed color="primary secondary--text" dark class="mb-2" @click.stop="toggle(true, 'investor')">New Investors</v-btn>
         </v-col>
@@ -124,6 +128,9 @@ export default {
                 type: "",
                 text: ""
             })
+        },
+         refresh(){
+           this.$store.dispatch("initInvestors")
         }
 
     },

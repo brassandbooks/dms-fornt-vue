@@ -145,7 +145,6 @@ export default {
 
         toggle(value, type){
             this.setDialog({type, value})
-            console.log(this.dialog);
         },
         closeAlert(){
             this.setAlert({is:false, type:"", text:""})

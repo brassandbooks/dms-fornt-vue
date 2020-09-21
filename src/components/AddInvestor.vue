@@ -15,7 +15,7 @@
                     </v-card-title>
 
                     <v-card-text>
-                        <v-form ref="form" v-model="valid" :lazy-validation="lazy">
+                        <v-form @submit.prevent="save" ref="form" v-model="valid" :lazy-validation="lazy">
                             <v-row no-gutters>
                                 <v-col cols="12" class="text-subtitle-1 mt-4">Personal Details</v-col>
                                 <v-col dense cols="12">
@@ -36,7 +36,7 @@
 
                                 <v-col cols="12" class="text-subtitle-1 mt-4">Bank Details</v-col>
                                 <v-col cols="12" sm="6">
-                                    <v-select :items="allBanks" v-model="bank" label="Bank"></v-select>
+                                    <v-select :items="allBanks" v-model="bank" :rules="[v => !!v || 'Bank is required']" label="Bank"></v-select>
                                 </v-col>
                                 <v-col dense cols="12" sm="6">
                                     <v-text-field type="text" prepend-icon="mdi-bank" v-model="accountNumber" :rules="accnumberRules" label="Account Number"></v-text-field>
@@ -44,7 +44,7 @@
                                 <v-col cols="12" class=" mt-4 d-flex justify-end">
                                     <v-spacer></v-spacer>
                                     <v-btn color="primary" text @click="close">Cancel</v-btn>
-                                    <v-btn color="primary" :loading="loading.add" depressed @click="save">Add Investor</v-btn>
+                                    <v-btn color="primary" :loading="loading.add" depressed type="submit">Add Investor</v-btn>
                                 </v-col>
                             </v-row>
                         </v-form>
@@ -132,7 +132,8 @@ export default {
                     email: this.email,
                     phoneNumber: this.phoneNumber,
                     bank: this.bank,
-                    accountNumber: this.accountNumber
+                    accountNumber: this.accountNumber,
+
                 }
                 console.log(newInvestor);
                 this.add(newInvestor)

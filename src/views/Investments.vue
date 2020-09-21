@@ -10,22 +10,44 @@
         </template>
     </v-snackbar>
     <v-row v-if="!showViewed" justify="center">
-        <v-col cols="12"  class="py-0 d-flex justify-space-between">
-            <div>
-                <v-btn :outlined="!all" :color="all ? 'primary secondary--text' : 'primary'" depressed class="mr-2" @click="init('all')">All</v-btn>
-                <v-btn :outlined="all" :color="!all ? 'primary secondary--text' : 'primary'" depressed @click="init('due')">Due for payment</v-btn>
-            </div>
-            <v-spacer></v-spacer>
+        <v-col cols="12" class="py-0 d-flex justify-space-between">
+
+            <v-form @submit.prevent="init('filter')" ref="form" v-model="valid" :lazy-validation="lazy">
+                <v-row no-gutters>
+                    <v-col cols="12" sm="2" class="mb-2">
+                        <v-btn color="primary secondary--text" depressed @click="init('all')">All</v-btn>
+                    </v-col>
+                    <v-col cols="2" sm="2">
+                        <v-text-field :rules="[v => !!v || 'Year is required']" class="ml-1" outlined dense type="text" v-model="filter.year" :value="filter.year"></v-text-field>
+                    </v-col>
+                    <v-col cols="4" sm="3">
+                        <v-select :rules="[v => !!v || 'Month is required']" class="ml-1" outlined dense :items="filter.months" v-model="filter.month" :value="filter.month"></v-select>
+                    </v-col>
+                    <v-col cols="3" sm="2">
+                        <v-select :rules="[v => !!v || 'Day is required']" class="ml-1" outlined dense :items="filter.days" v-model="filter.day" label="Day"></v-select>
+                    </v-col>
+                    <v-col cols="2" sm="2" class="ml-md-2">
+                        <v-btn class="d-none d-sm-flex" type="submit" depressed color="primary secondary--text">
+                            Filter      
+                        </v-btn>
+                        <v-btn type="submit"  class="d-flex d-sm-none ml-1"  color="primary  secondary--text">
+                            <v-icon>mdi-magnify</v-icon>
+                        </v-btn>
+                    </v-col>
+                </v-row>
+            </v-form>
+            <!-- <v-spacer></v-spacer>
             <v-btn @click="refresh" text color="primary">
-              <v-icon>mdi-autorenew</v-icon>
-              Refresh
-            </v-btn>
+                <v-icon>mdi-autorenew</v-icon>
+                Refresh
+            </v-btn> -->
         </v-col>
-        <v-col cols="12">
+
+        <v-col cols="12" class="pt-0">
             <v-data-table :search="search" :loading="loading.investments" loading-text="Loading... Please wait" :headers="headers" :items="investments" sort-by="calories" class="elevation-1">
                 <template v-slot:top>
                     <v-toolbar flat color="white">
-                        <v-toolbar-title  class="text-uppercase">{{title}}</v-toolbar-title>
+                        <v-toolbar-title class="text-uppercase">{{title}}</v-toolbar-title>
                         <v-divider class="mx-4" inset vertical></v-divider>
                         <v-spacer></v-spacer>
                         <v-text-field v-model="search" prepend-icon="mdi-magnify" label="Search" single-line hide-details></v-text-field>
@@ -62,7 +84,9 @@ export default {
         ViewInvestment,
     },
     data: () => ({
-      title: "Investments",
+        valid: true,
+        lazy: false,
+        title: "Investments",
         all: true,
         showViewed: false,
         viewedInvestment: {},
@@ -100,6 +124,14 @@ export default {
                 sortable: false,
             },
         ],
+
+        filter: {
+            year: `${new Date().getFullYear()}`,
+            month: "",
+            day: "",
+            months: ['January', 'February', "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+            days: [1, 5, 10, 19]
+        }
     }),
 
     computed: {
@@ -135,6 +167,7 @@ export default {
     },
     created() {
         this.$store.dispatch("initInvestments");
+        this.filter.month = this.filter.months[new Date().getMonth()];
     },
     methods: {
         ...mapMutations({
@@ -142,7 +175,7 @@ export default {
             setDialog: "Set_Dialog",
         }),
         ...mapActions({
-            getInvestments : "initInvestments"
+            getInvestments: "initInvestments"
         }),
 
         init(arg) {
@@ -151,26 +184,16 @@ export default {
                 this.title = 'Investments'
                 this.getInvestments()
 
-            } else if (arg === "due") {
-
-                this.all = false;
-
-                let year = new Date().getFullYear() 
-                let month = new Date().getMonth() + 1
-                let day = new Date().getDay()
-
-                const date = {
-                  year,
-                  month,
-                  day
+            } else if (arg === "filter") {
+                if (this.$refs.form.validate()) {
+                    this.all = false;
+                    this.getInvestments(this.filter)
+                    this.title = "Due Investments"
                 }
-
-                this.getInvestments(date)
-                this.title = "Due Investments"
             }
         },
         view(item) {
-          item.fromInvestor = false
+            item.fromInvestor = false
             this.viewedInvestment = item;
             this.toggleView(true);
         },
@@ -185,13 +208,19 @@ export default {
                 text: "",
             });
         },
-        refresh(){
-          if(this.all){
-            this.init('all')
-          }else {
-            this.init('due')
-          }
-        }
+        refresh() {
+            if (this.all) {
+                this.init('all')
+            } else {
+                this.init('filter')
+            }
+        },
+        reset() {
+            this.$refs.form.reset()
+        },
+        resetValidation() {
+            this.$refs.form.resetValidation()
+        },
     },
 };
 </script>

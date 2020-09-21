@@ -39,7 +39,7 @@
             <v-list dense shaped color="primary">
                 <v-list-item >
                     <v-list-item-content>
-                       <v-list-item-title class="mb-2 text-subtitle-1">{{user.fullName}}</v-list-item-title>
+                       <v-list-item-title class="mb-2 text-subtitle-1">{{user !== null ? user.fullName : ''}}</v-list-item-title>
                      <v-list-item-subtitle class="font-weight-normal">Logged In</v-list-item-subtitle>
                     </v-list-item-content>
                 </v-list-item>
