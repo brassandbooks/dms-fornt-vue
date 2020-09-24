@@ -15,10 +15,72 @@
       </template>
     </v-snackbar>
     <v-row v-if="!showViewed" justify="center">
+      <v-col cols="12" class="py-0 d-flex justify-space-between">
+        <v-form
+          @submit.prevent="filterDue"
+          ref="form"
+          v-model="valid"
+          :lazy-validation="lazy"
+        >
+          <v-row no-gutters>
+            <v-col cols="2" sm="2">
+              <v-text-field
+                :rules="[(v) => !!v || 'Year is required']"
+                class="ml-1"
+                outlined
+                dense
+                type="text"
+                v-model="filter.year"
+                :value="filter.year"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="4" sm="3">
+              <v-select
+                :rules="[(v) => !!v || 'Month is required']"
+                class="ml-1"
+                outlined
+                dense
+                :items="filter.months"
+                v-model="filter.month"
+                :value="filter.month"
+              ></v-select>
+            </v-col>
+            <v-col cols="3" sm="2">
+              <v-select
+                :rules="[(v) => !!v || 'Day is required']"
+                class="ml-1"
+                outlined
+                dense
+                :items="filter.days"
+                v-model="filter.day"
+                label="Day"
+              ></v-select>
+            </v-col>
+            <v-col cols="2" sm="2" class="ml-md-2">
+              <v-btn
+                class="d-none d-sm-flex"
+                type="submit"
+                depressed
+                color="primary secondary--text"
+              >
+                Filter
+              </v-btn>
+              <v-btn
+                type="submit"
+                class="d-flex d-sm-none ml-1"
+                color="primary  secondary--text"
+              >
+                <v-icon>mdi-magnify</v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-form>
+      </v-col>
+
       <v-col cols="12" class="pt-0">
         <v-data-table
           :search="search"
-          :loading="loading.investments"
+          :loading="loading.dueInvestments"
           loading-text="Loading... Please wait"
           :headers="headers"
           :items="investments"
@@ -58,9 +120,9 @@
               color="secondary primary--text"
               small
               depressed
-              @click="view(item)"
+              @click="pay(item)"
             >
-              view
+              pay
             </v-btn>
           </template>
         </v-data-table>
@@ -105,10 +167,22 @@ export default {
         value: "product",
       },
       {
-        text: "Principal Sum",
-        value: "principalSum",
+        text: "Distribution Amount",
+        value: "distributionAmount",
       },
 
+      {
+        text: "Month",
+        value: "month",
+      },
+      {
+        text: "Bank",
+        value: "bank",
+      },
+      {
+        text: "Account Number",
+        value: "accountNumber",
+      },
       {
         text: "Distribution Date",
         value: "distributionDate",
@@ -152,7 +226,7 @@ export default {
       alert: "Get_Alert",
       loading: "Get_Loading",
       user: "Get_User",
-      allInvestments: "Get_Investments",
+      allInvestments: "Get_DueInvestments",
     }),
     investments() {
       this.allInvestments.forEach((el) => {
@@ -168,20 +242,24 @@ export default {
           style: "currency",
           currency: "NGN",
         });
-
+        el.bank = el.investorDetails.bank;
+        el.accountNumber = el.investorDetails.accountNumber;
         el.effectiveDate = new Date(el.effectiveDate).toLocaleDateString(
           "en-NG"
         );
         el.expiringDate = new Date(el.expiringDate).toLocaleDateString("en-NG");
       });
 
-  
       return this.allInvestments;
     },
   },
   created() {
-    this.$store.dispatch("initInvestments");
     this.filter.month = this.filter.months[new Date().getMonth()];
+    this.$store.dispatch("dueInvestments", {
+      year: this.filter.year,
+      month: this.filter.month,
+      day: new Date().getDay(),
+    });
   },
   methods: {
     ...mapMutations({
@@ -189,7 +267,7 @@ export default {
       setDialog: "Set_Dialog",
     }),
     ...mapActions({
-      getInvestments: "initInvestments",
+      getInvestments: "dueInvestments",
     }),
 
     getSchedule(schedule) {
@@ -197,11 +275,20 @@ export default {
         return el.year === this.filter.year && el.month === this.filter.month;
       });
     },
-
-    view(item) {
-      item.fromInvestor = true;
-      this.viewedInvestment = item;
-      this.toggleView(true);
+    filterDue() {
+      if (this.$refs.form.validate()) {
+        this.all = false;
+        const date = {
+          year: this.filter.year,
+          month: this.filter.month,
+          day: this.filter.day,
+        };
+        this.getInvestments(date);
+        this.title = "Due Investments";
+      }
+    },
+    pay(item) {
+      console.log(item.schedule);
     },
 
     toggleView(on) {
@@ -220,6 +307,12 @@ export default {
       } else {
         this.init("filter");
       }
+    },
+    reset() {
+      this.$refs.form.reset();
+    },
+    resetValidation() {
+      this.$refs.form.resetValidation();
     },
   },
 };

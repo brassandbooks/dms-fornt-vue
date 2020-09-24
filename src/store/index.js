@@ -15,6 +15,7 @@ export default new Vuex.Store({
 
       add: false,
       addInvestment: false,
+      dueInvestments: false,
       update: false,
       login: false,
       investors: false,
@@ -45,6 +46,7 @@ export default new Vuex.Store({
     investors: [],
     investor: null,
     investments: [],
+    dueInvestments: [],
     investment: [],
     banks: []
 
@@ -83,6 +85,9 @@ export default new Vuex.Store({
     "Get_Investments"(state) {
       return state.investments
     },
+    "Get_DueInvestments"(state) {
+      return state.dueInvestments
+    },
     "Get_Investment"(state) {
       return state.investment
     }
@@ -119,6 +124,9 @@ export default new Vuex.Store({
     },
     "Set_Investments"(state, investments) {
       state.investments = investments
+    },
+    "Set_DueInvestments"(state, investments) {
+      state.dueInvestments = investments
     },
     "Set_Investment"(state, investment) {
       state.investment = investment
@@ -159,10 +167,12 @@ export default new Vuex.Store({
         .then(res => res.json())
         .then(resp => {
           let banks = []
+          banks.push('Brass & Books')
           resp.data.forEach(bank => {
             banks.push(bank.name)
           })
-          commit("Set_Banks", banks)
+
+          commit("Set_Banks", banks.sort())
         })
         .catch(err => {
           console.log(err);
@@ -247,9 +257,9 @@ export default new Vuex.Store({
         })
     },
 
-    async initInvestments({ commit, dispatch }, date) {
+    async initInvestments({ commit, dispatch }) {
       let api
-      date ? api = `https://bbdms.herokuapp.com/api/investment/search/${date.year}/${date.month}/${date.day}` : api = "https://bbdms.herokuapp.com/api/investment"
+      api = "https://bbdms.herokuapp.com/api/investment"
 
       commit("Set_Loading", { type: "investments", value: true })
       const token = localStorage.getItem('userToken')
@@ -264,12 +274,9 @@ export default new Vuex.Store({
         .then(res => res.json())
         .then(resp => {
           if (resp.status == 1) {
+
             commit("Set_Investments", resp.data)
             commit("Set_Loading", { type: "investments", value: false })
-
-            if (date && !resp.data.length) {
-              dispatch("Init_Alert", { type: "primary", text: 'No Due Investments' })
-            }
 
           } else {
             commit("Set_Loading", { type: "investments", value: false })
@@ -281,6 +288,83 @@ export default new Vuex.Store({
           dispatch("Init_Alert", { time: 6, type: "primary", text: `${err.message}, make sure your have internet connection` })
         })
     },
+
+    searchInvestments({ state },) {
+
+      console.log(state.investments);
+    },
+
+    async dueInvestments({ commit, dispatch }, date) {
+
+      //let api = `https://bbdms.herokuapp.com/api/investment/search/${date.year}/${date.month}/${date.day}`
+      let api = "https://bbdms.herokuapp.com/api/investment"
+      commit("Set_Loading", { type: "dueInvestments", value: true })
+      const token = localStorage.getItem('userToken')
+
+      await await fetch(api, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token} `,
+        },
+      })
+        .then(res => res.json())
+        .then(resp => {
+          if (resp.status === 1) {
+            //Search throught the array of investment to filter for due investments
+            let filtered = []
+            let investments = resp.data
+
+            investments.forEach(investment => {
+              let scheduleArr = investment.schedule.find(el => {
+                return el.year === date.year && el.month === date.month && el.day === date.day
+              })
+
+              if (scheduleArr) {
+                filtered.push(investment)
+              } else {
+                console.log('no due investment');
+              }
+
+            })
+
+
+            //Add the months and scheduleID to the investment so payment can be processed
+            let schedule
+            filtered.forEach(investment => {
+              schedule = investment.schedule
+
+              schedule.forEach(el => {
+                if (el.year === date.year && el.month === date.month) {
+                  investment.month = el.month
+                  investment.scheduleID = el._id
+                }
+
+              })
+
+            })
+
+
+            //console.log(resp.data);
+            commit("Set_DueInvestments", filtered)
+            commit("Set_Loading", { type: "dueInvestments", value: false })
+
+
+            if (!resp.data.length) {
+              dispatch("Init_Alert", { type: "primary", text: 'No Due Investments' })
+            }
+
+          } else {
+            commit("Set_Loading", { type: "dueInvestments", value: false })
+          }
+
+        }).catch(err => {
+          console.log(err);
+          commit("Set_Loading", { type: "dueInvestments", value: false })
+          dispatch("Init_Alert", { time: 6, type: "primary", text: `${err.message}, make sure your have internet connection` })
+        })
+    },
+
 
     async addInvestment({ commit, dispatch }, investment) {
 
@@ -378,6 +462,9 @@ export default new Vuex.Store({
         })
     },
     async getInvestment({ commit, dispatch }, id) {
+
+      commit("Set_Investment", [])
+
 
       commit("Set_Loading", { type: "singleInvestment", value: true })
       const token = localStorage.getItem('userToken')
