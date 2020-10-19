@@ -17,6 +17,7 @@ export default new Vuex.Store({
       addInvestment: false,
       dueInvestments: false,
       update: false,
+      updateInvestment: false,
       login: false,
       investors: false,
       investments: false,
@@ -26,6 +27,7 @@ export default new Vuex.Store({
     dialog: {
       view: false,
       update: false,
+      updateInvestment: false,
       investor: false,
       investment: false
     },
@@ -389,8 +391,9 @@ export default new Vuex.Store({
             dispatch("Init_Alert", { type: "success", text: resp.message })
             dispatch("getInvestment", investment.investor)
           } else {
+            console.log(resp.data[0].msg);
             commit("Set_Loading", { type: "addInvestment", value: false })
-            dispatch("Init_Alert", { type: "error", text: resp.message })
+            dispatch("Init_Alert", { type: "error", text: resp.data[0].msg })
           }
         }).catch(err => {
           console.log(err);
@@ -416,14 +419,13 @@ export default new Vuex.Store({
         .then(res => res.json())
         .then(resp => {
           if (resp.status == 1) {
-            console.log(resp);
             dispatch("Init_Alert", { type: "success", text: resp.message })
             commit("Set_Dialog", { type: "investor", value: false })
             commit("Set_Loading", { type: "add", value: false })
             dispatch("initInvestors")
           } else {
-            console.log(resp);
-            dispatch("Init_Alert", { type: "error", text: resp.message })
+
+            dispatch("Init_Alert", { type: "error", text: resp.data[0].msg })
             commit("Set_Loading", { type: "add", value: false })
           }
         })
@@ -517,11 +519,45 @@ export default new Vuex.Store({
           } else {
 
             commit("Set_Loading", { type: "update", value: false })
-            dispatch("Init_Alert", { type: "error", text: resp.message })
+            dispatch("Init_Alert", { type: "error", text: resp.data[0].msg })
           }
         })
         .catch(err => {
           commit("Set_Loading", { type: "update", value: false })
+          dispatch("Init_Alert", { type: "error", text: err.message })
+          console.log(err);
+        })
+
+    },
+    async updateInvestment({ commit, dispatch }, investment) {
+
+      commit("Set_Loading", { type: "updateInvestment", value: true })
+
+      const token = localStorage.getItem('userToken')
+      await await fetch(`https://bbdms.herokuapp.com/api/investment/${investment.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token} `,
+        },
+        body: JSON.stringify(investment)
+
+      })
+        .then(res => res.json())
+        .then(resp => {
+          if (resp.status === 1) {
+            commit("Set_Loading", { type: "updateInvestment", value: false })
+            commit("Set_Dialog", { type: "updateInvestment", value: false })
+            dispatch("Init_Alert", { type: "success", text: resp.message })
+            dispatch("initInvestments")
+          } else {
+
+            commit("Set_Loading", { type: "updateInvestment", value: false })
+            dispatch("Init_Alert", { type: "error", text: resp.data[0].msg })
+          }
+        })
+        .catch(err => {
+          commit("Set_Loading", { type: "updateInvestment", value: false })
           dispatch("Init_Alert", { type: "error", text: err.message })
           console.log(err);
         })

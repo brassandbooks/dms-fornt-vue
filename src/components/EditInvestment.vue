@@ -2,13 +2,17 @@
   <v-container>
     <v-row>
       <v-col cols="12">
-        <v-dialog persistent v-model="dialog.investment" max-width="500px">
+        <v-dialog
+          persistent
+          v-model="dialog.updateInvestment"
+          max-width="500px"
+        >
           <v-card>
             <v-card-title class="primary--text pt-6 ">
               <v-icon large color="primary" class="mr-4">
                 mdi-cash-check
               </v-icon>
-              <span class="headline">Add New Investment</span>
+              <span class="headline">Edit Investment</span>
             </v-card-title>
 
             <v-card-text>
@@ -25,7 +29,7 @@
                         autofocus
                         :rules="[(v) => !!v || 'Principal Sum is required']"
                         type="text"
-                        v-model="principalSum"
+                        v-model="editedInvestment.principalSum"
                         label="Principal Sum"
                       ></v-text-field>
                     </v-col>
@@ -33,7 +37,7 @@
                       <v-select
                         :rules="[(v) => !!v || 'Product is required']"
                         :items="products"
-                        v-model="product"
+                        v-model="editedInvestment.product"
                         label="Products"
                       ></v-select>
                     </v-col>
@@ -41,7 +45,7 @@
                       <v-text-field
                         :rules="[(v) => !!v || 'Interest Rate is required']"
                         type="text"
-                        v-model="interestRate"
+                        v-model="editedInvestment.interestRate"
                         label="Interest Rate"
                       ></v-text-field>
                     </v-col>
@@ -59,7 +63,7 @@
                             :rules="[
                               (v) => !!v || 'Effective Date is required',
                             ]"
-                            v-model="effectiveDate"
+                            v-model="editedInvestment.effectiveDate"
                             label="Effective Date"
                             prepend-icon="mdi-calendar"
                             readonly
@@ -69,7 +73,7 @@
                         </template>
                         <v-date-picker
                           color="primary"
-                          v-model="effectiveDate"
+                          v-model="editedInvestment.effectiveDate"
                           no-title
                           scrollable
                         >
@@ -80,7 +84,9 @@
                           <v-btn
                             text
                             color="primary"
-                            @click="$refs.menu.save(distributionDate)"
+                            @click="
+                              $refs.menu.save(editedInvestment.distributionDate)
+                            "
                             >OK</v-btn
                           >
                         </v-date-picker>
@@ -92,7 +98,7 @@
                           (v) => !!v || 'Investment Duration is required',
                         ]"
                         type="text"
-                        v-model="investmentDuration"
+                        v-model="editedInvestment.investmentDuration"
                         label="Investment Duration"
                       ></v-text-field>
                     </v-col>
@@ -100,7 +106,7 @@
                       <v-select
                         :rules="[(v) => !!v || 'Distribution Date is required']"
                         :items="distributionDates"
-                        v-model="distributionDate"
+                        v-model="editedInvestment.distributionDate"
                         label="Distribution Date"
                       ></v-select>
                     </v-col>
@@ -108,7 +114,7 @@
                       <v-select
                         :rules="[(v) => !!v || 'Payout Frequency is required']"
                         :items="payoutFrequencys"
-                        v-model="payoutFrequency"
+                        v-model="editedInvestment.payoutFrequency"
                         label="Payout Frequency"
                       ></v-select>
                     </v-col>
@@ -118,10 +124,10 @@
                       <v-btn color="primary" text @click="close">Cancel</v-btn>
                       <v-btn
                         color="primary"
-                        :loading="loading.addInvestment"
+                        :loading="loading.updateInvestment"
                         depressed
                         type="submit"
-                        >Add Investment</v-btn
+                        >Update Investment</v-btn
                       >
                     </v-col>
                   </v-row>
@@ -141,36 +147,50 @@ export default {
   props: {
     dialog: Object,
     toggle: Function,
-    investor: Object,
+    investment: Object,
   },
   data: () => ({
     valid: true,
     lazy: false,
     menu: false,
-    principalSum: "",
-    interestRate: "",
-    effectiveDate: "",
-    investmentDuration: "",
     distributionDate: new Date().toISOString().substr(0, 10),
-    payoutFrequency: "",
-    product: "",
     distributionDates: [1, 5, 10, 19],
     payoutFrequencys: ["Monthly", "Biannually", "Quarterly", "Annually"],
-
     products: ["Bond Fund", "Growth Fund", "Term Fund", "Premium Fund"],
   }),
   computed: {
     ...mapGetters({
       loading: "Get_Loading",
     }),
+
+    editedInvestment() {
+      const frequency = ["Monthly", "Quarterly", "Biannually", "Annually"];
+
+      //convert the local string of the principal to number
+      const principalSum = parseFloat(
+        this.investment.principalSum.slice(1, -1).replace(",", "")
+      );
+
+      return {
+        principalSum: principalSum,
+        interestRate: this.investment.interestRate,
+        effectiveDate: this.investment.effectiveDate,
+        investmentDuration: this.investment.investmentDuration,
+        distributionDate: this.investment.distributionDate,
+        payoutFrequency: frequency[this.investment.payoutFrequency],
+        product: this.investment.product,
+        investor: this.investment.investorDetails._id,
+        id: this.investment._id,
+      };
+    },
   },
+
   methods: {
     ...mapActions({
-      saveInvestment: "addInvestment",
+      saveInvestment: "updateInvestment",
     }),
     close() {
-      this.toggle(false, "investment");
-      this.reset();
+      this.toggle(false, "updateInvestment");
       this.resetValidation();
     },
     save() {
@@ -179,14 +199,18 @@ export default {
         const value = [1, 3, 6, 12];
 
         const investment = {
-          principalSum: parseFloat(this.principalSum),
-          interestRate: parseFloat(this.interestRate),
-          effectiveDate: new Date(this.effectiveDate).getTime(),
-          investmentDuration: this.investmentDuration,
-          distributionDate: this.distributionDate,
-          payoutFrequency: value[frequency.indexOf(this.payoutFrequency)],
-          product: this.product,
-          investor: this.investor.id,
+          principalSum: parseFloat(this.editedInvestment.principalSum),
+          interestRate: parseFloat(this.editedInvestment.interestRate),
+          effectiveDate: new Date(
+            this.editedInvestment.effectiveDate
+          ).getTime(),
+          investmentDuration: this.editedInvestment.investmentDuration,
+          distributionDate: this.editedInvestment.distributionDate,
+          payoutFrequency:
+            value[frequency.indexOf(this.editedInvestment.payoutFrequency)],
+          product: this.editedInvestment.product,
+          investor: this.editedInvestment.investor,
+          id: this.editedInvestment.id,
         };
 
         this.saveInvestment(investment);

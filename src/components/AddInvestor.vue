@@ -176,7 +176,7 @@ export default {
           bank: this.bank,
           accountNumber: this.accountNumber,
         };
-        console.log(newInvestor);
+      
         this.add(newInvestor);
       }
     },
