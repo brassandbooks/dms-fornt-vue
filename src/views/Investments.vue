@@ -105,6 +105,10 @@ export default {
         value: "product",
       },
       {
+        text: "Payout Frequency",
+        value: "payoutFrequency",
+      },
+      {
         text: "Principal Sum",
         value: "principalSum",
       },
@@ -154,8 +158,11 @@ export default {
       user: "Get_User",
       allInvestments: "Get_Investments",
     }),
+
     investments() {
       this.allInvestments.forEach((el) => {
+        const frequency = ["Monthly", "Quarterly", "Biannually", "Annually"];
+        const value = [1, 3, 6, 12];
         let name = `${el.investorDetails.firstName} ${el.investorDetails.lastName}`;
         el.investor = name;
 
@@ -169,13 +176,14 @@ export default {
           currency: "NGN",
         });
 
-        el.effectiveDate = new Date(el.effectiveDate).toLocaleDateString(
-          "en-NG"
-        );
+        // el.effectiveDate = new Date(el.effectiveDate).toLocaleDateString(
+        //   "en-NG"
+        // );
         el.expiringDate = new Date(el.expiringDate).toLocaleDateString("en-NG");
+
+        el.payoutFrequency = frequency[value.indexOf(el.payoutFrequency)];
       });
 
-  
       return this.allInvestments;
     },
   },

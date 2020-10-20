@@ -155,7 +155,7 @@ export default {
     payoutFrequency: "",
     product: "",
     distributionDates: [1, 5, 10, 19],
-    payoutFrequencys: ["Monthly", "Biannually", "Quarterly", "Annually"],
+    payoutFrequencys: ["Monthly", "Quarterly", "Biannually", "Annually"],
 
     products: ["Bond Fund", "Growth Fund", "Term Fund", "Premium Fund"],
   }),

@@ -317,6 +317,7 @@ export default new Vuex.Store({
             let filtered = []
             let investments = resp.data
 
+
             investments.forEach(investment => {
               let scheduleArr = investment.schedule.find(el => {
                 return el.year === date.year && el.month === date.month && el.day === date.day

@@ -53,9 +53,7 @@
                 </div>
                 <div>
                   Effective Date
-                  <span class="font-weight-bold ml-2">{{
-                    investment.effectiveDate
-                  }}</span>
+                  <span class="font-weight-bold ml-2">{{ effectiveDate }}</span>
                 </div>
               </v-col>
               <v-col cols="12">
@@ -66,6 +64,7 @@
                         <th class="text-left">Principal Sum</th>
                         <th class="text-left">Interest Rate</th>
                         <th class="text-left">Distribution Amount</th>
+                        <th class="text-left">Payout Frequency</th>
                         <th class="text-left">Distribution Date</th>
                         <th class="text-left">Expiring Date</th>
                       </tr>
@@ -75,6 +74,7 @@
                         <td>{{ investment.principalSum }}</td>
                         <td>{{ investment.interestRate }}</td>
                         <td>{{ investment.distributionAmount }}</td>
+                        <td>{{ investment.payoutFrequency }}</td>
                         <td>{{ investment.distributionDate }}</td>
                         <td>{{ investment.expiringDate }}</td>
                       </tr>
@@ -139,12 +139,12 @@ export default {
     investment: Object,
     toggleView: Function,
   },
-
   components: {
     EditInvestment,
   },
 
   data: () => ({
+    effectiveDate: "",
     headers: [
       {
         text: "Month",
@@ -156,6 +156,7 @@ export default {
         text: "Day",
         value: "day",
       },
+
       {
         text: "Year",
         value: "year",
@@ -178,6 +179,12 @@ export default {
   }),
   computed: {
     ...mapGetters({ alert: "Get_Alert", dialog: "Get_Dialog" }),
+  },
+
+  created() {
+    this.effectiveDate = new Date(
+      this.investment.effectiveDate
+    ).toLocaleDateString("en-NG");
   },
   methods: {
     ...mapMutations({ setAlert: "Set_Alert", setDialog: "Set_Dialog" }),

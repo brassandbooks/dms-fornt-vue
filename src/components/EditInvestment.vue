@@ -164,20 +164,26 @@ export default {
     }),
 
     editedInvestment() {
-      const frequency = ["Monthly", "Quarterly", "Biannually", "Annually"];
-
       //convert the local string of the principal to number
       const principalSum = parseFloat(
-        this.investment.principalSum.slice(1, -1).replace(",", "")
+        this.investment.principalSum
+          .slice(1, -1)
+          .split(",")
+          .join("")
       );
 
+      this.investment.effectiveDate.toString();
+      console.log(this.investment.effectiveDate);
+      const effectiveDate = new Date(this.investment.effectiveDate)
+        .toISOString()
+        .substr(0, 10);
       return {
         principalSum: principalSum,
         interestRate: this.investment.interestRate,
-        effectiveDate: this.investment.effectiveDate,
+        effectiveDate: effectiveDate,
         investmentDuration: this.investment.investmentDuration,
         distributionDate: this.investment.distributionDate,
-        payoutFrequency: frequency[this.investment.payoutFrequency],
+        payoutFrequency: this.investment.payoutFrequency,
         product: this.investment.product,
         investor: this.investment.investorDetails._id,
         id: this.investment._id,
@@ -198,6 +204,10 @@ export default {
         const frequency = ["Monthly", "Quarterly", "Biannually", "Annually"];
         const value = [1, 3, 6, 12];
 
+        console.log(this.editedInvestment.effectiveDate);
+        let el = new Date(this.editedInvestment.effectiveDate).getTime();
+        console.log(el);
+
         const investment = {
           principalSum: parseFloat(this.editedInvestment.principalSum),
           interestRate: parseFloat(this.editedInvestment.interestRate),
@@ -212,7 +222,7 @@ export default {
           investor: this.editedInvestment.investor,
           id: this.editedInvestment.id,
         };
-
+        console.log(investment);
         this.saveInvestment(investment);
       }
     },
