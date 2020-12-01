@@ -73,6 +73,24 @@
                 <v-icon>mdi-magnify</v-icon>
               </v-btn>
             </v-col>
+            <v-col class="d-flex justify-end py-0 ">
+              <v-btn
+                :disabled="!investments.length"
+                depressed
+                color="primary secondary--text "
+              >
+                <download-excel
+                  :header="jsonHeader"
+                  :data="jsonData"
+                  :fields="json_fields"
+                  worksheet="My Worksheet"
+                  :stringifyLongNum="true"
+                  name="dms-Due-Investment.xls"
+                >
+                  Export Excel
+                </download-excel>
+              </v-btn>
+            </v-col>
           </v-row>
         </v-form>
       </v-col>
@@ -105,15 +123,16 @@
                         <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">New Investment</v-btn> -->
             </v-toolbar>
           </template>
-          <template v-slot:item.actions="{ item }">
-            <v-btn
-              color="secondary primary--text"
+          <template v-slot:item.status="{ item }">
+            <v-chip
               small
               depressed
-              @click="view(item)"
+              :color="item.status === 'active' ? 'error' : 'success'"
+              dark
+              class="text-uppercase"
             >
-              view
-            </v-btn>
+              Active
+            </v-chip>
           </template>
           <template v-slot:item.actions="{ item }">
             <v-btn
@@ -160,7 +179,7 @@ export default {
         text: "Investor",
         align: "start",
         sortable: false,
-        value: "investor",
+        value: "fullName",
       },
       {
         text: "Product",
@@ -191,6 +210,10 @@ export default {
         text: "Expiring Date",
         value: "expiringDate",
       },
+      // {
+      //   text: "Status",
+      //   value: "status",
+      // },
 
       {
         text: "Actions",
@@ -219,6 +242,26 @@ export default {
       ],
       days: [1, 5, 10, 19],
     },
+    json_fields: {
+      Investor: "fullName",
+      Product: "product",
+      "Payout Frequency": "payoutFrequency",
+      "Distibution Amount": "distributionAmount",
+      Bank: "bank",
+      "Account Number": "accountNumber",
+      Month: "month",
+      "Distribution Date": "distributionDate",
+      "Expiring Date": "expiringDate",
+    },
+
+    json_meta: [
+      [
+        {
+          key: "charset",
+          value: "utf-8",
+        },
+      ],
+    ],
   }),
 
   computed: {
@@ -230,20 +273,18 @@ export default {
     }),
     investments() {
       this.allInvestments.forEach((el) => {
-        let name = `${el.investorDetails.firstName} ${el.investorDetails.lastName}`;
-        el.investor = name;
-
+        let fullName = `${el.investor.firstName} ${el.investor.lastName}`;
         el.principalSum = el.principalSum.toLocaleString("en-NG", {
           style: "currency",
           currency: "NGN",
         });
-
+        el.fullName = fullName;
         el.distributionAmount = el.distributionAmount.toLocaleString("en-NG", {
           style: "currency",
           currency: "NGN",
         });
-        el.bank = el.investorDetails.bank;
-        el.accountNumber = el.investorDetails.accountNumber;
+        el.bank = el.investor.bank;
+        el.accountNumber = el.investor.accountNumber;
         el.effectiveDate = new Date(el.effectiveDate).toLocaleDateString(
           "en-NG"
         );
@@ -251,6 +292,28 @@ export default {
       });
 
       return this.allInvestments;
+    },
+    jsonHeader() {
+      return `DUE INVESTMENTS FOR THE MONTH OF ${this.filter.month} : ${this.filter.day}`;
+    },
+    jsonData() {
+      let excelData = [];
+      console.log(this.allInvestments);
+      this.investments.forEach((el) => {
+        let data = {
+          fullName: el.fullName,
+          product: el.product,
+          payoutFrequency: el.payoutFrequency,
+          distributionAmount: el.distributionAmount,
+          bank: el.bank,
+          accountNumber: `ACC-${el.accountNumber}`,
+          distributionDate: el.distributionDate,
+          expiringDate: el.expiringDate,
+        };
+        excelData.push(data);
+      });
+
+      return excelData;
     },
   },
   created() {

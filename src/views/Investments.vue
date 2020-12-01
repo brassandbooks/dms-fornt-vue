@@ -14,7 +14,26 @@
         </v-btn>
       </template>
     </v-snackbar>
+
     <v-row v-if="!showViewed" justify="center">
+      <v-col class="d-flex justify-end">
+        <v-btn
+          :disabled="!investments.length"
+          depressed
+          color="primary secondary--text "
+        >
+          <download-excel
+            header="DMS INVESTMENTS"
+            :data="jsonData"
+            :fields="json_fields"
+            worksheet="My Worksheet"
+            :stringifyLongNum="true"
+            name="dms-Investment.xls"
+          >
+            Export Excel
+          </download-excel>
+        </v-btn>
+      </v-col>
       <v-col cols="12" class="pt-0">
         <v-data-table
           :search="search"
@@ -43,16 +62,18 @@
                         <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">New Investment</v-btn> -->
             </v-toolbar>
           </template>
-          <template v-slot:item.actions="{ item }">
-            <v-btn
-              color="secondary primary--text"
+          <template v-slot:item.status="{ item }">
+            <v-chip
               small
               depressed
-              @click="view(item)"
+              :color="item.status === 'active' ? 'error' : 'success'"
+              dark
+              class="text-uppercase"
             >
-              view
-            </v-btn>
+              Active
+            </v-chip>
           </template>
+
           <template v-slot:item.actions="{ item }">
             <v-btn
               color="secondary primary--text"
@@ -98,7 +119,7 @@ export default {
         text: "Investor",
         align: "start",
         sortable: false,
-        value: "investor",
+        value: "fullName",
       },
       {
         text: "Product",
@@ -121,6 +142,10 @@ export default {
         text: "Expiring Date",
         value: "expiringDate",
       },
+      // {
+      //   text: "Status",
+      //   value: "status",
+      // },
 
       {
         text: "Actions",
@@ -149,6 +174,27 @@ export default {
       ],
       days: [1, 5, 10, 19],
     },
+    json_fields: {
+      Investor: "fullName",
+      Product: "product",
+      "Payout Frequency": "payoutFrequency",
+      "Principal Sum": "principalSum",
+      "Distibution Amount": "distributionAmount",
+      Bank: "bank",
+      "Account Number": "accountNumber",
+
+      "Distribution Date": "distributionDate",
+      "Expiring Date": "expiringDate",
+    },
+
+    json_meta: [
+      [
+        {
+          key: "charset",
+          value: "utf-8",
+        },
+      ],
+    ],
   }),
 
   computed: {
@@ -163,28 +209,48 @@ export default {
       this.allInvestments.forEach((el) => {
         const frequency = ["Monthly", "Quarterly", "Biannually", "Annually"];
         const value = [1, 3, 6, 12];
-        let name = `${el.investorDetails.firstName} ${el.investorDetails.lastName}`;
-        el.investor = name;
+        let fullName = `${el.investor.firstName} ${el.investor.lastName}`;
 
+        el.fullName = fullName;
         el.principalSum = el.principalSum.toLocaleString("en-NG", {
           style: "currency",
           currency: "NGN",
         });
-
+        el.bank = el.investor.bank;
+        el.accountNumber = el.investor.accountNumber;
         el.distributionAmount = el.distributionAmount.toLocaleString("en-NG", {
           style: "currency",
           currency: "NGN",
         });
-
         // el.effectiveDate = new Date(el.effectiveDate).toLocaleDateString(
         //   "en-NG"
         // );
         el.expiringDate = new Date(el.expiringDate).toLocaleDateString("en-NG");
-
         el.payoutFrequency = frequency[value.indexOf(el.payoutFrequency)];
       });
 
       return this.allInvestments;
+    },
+
+    jsonData() {
+      let excelData = [];
+
+      this.investments.forEach((el) => {
+        let data = {
+          fullName: el.fullName,
+          product: el.product,
+          payoutFrequency: el.payoutFrequency,
+          principalSum: el.principalSum,
+          distributionAmount: el.distributionAmount,
+          bank: el.bank,
+          accountNumber: `ACC-${el.accountNumber}`,
+          distributionDate: el.distributionDate,
+          expiringDate: el.expiringDate,
+        };
+        excelData.push(data);
+      });
+
+      return excelData;
     },
   },
   created() {

@@ -2,15 +2,19 @@
   <v-container>
     <v-row>
       <v-col cols="12">
-        <v-col cols="12" class="pt-0 my-0 d-flex justify-end">
+        <v-col cols="12" class="pt-0 my-0 d-flex justify-space-between">
+          <!-- <v-btn depressed color="primary secondary--text">
+            Close Investment
+          </v-btn> -->
+          <v-spacer></v-spacer>
           <v-btn
             @click.stop="toggle(true, 'updateInvestment')"
             depressed
             color="primary secondary--text"
           >
             Edit Investment
-          </v-btn></v-col
-        >
+          </v-btn>
+        </v-col>
         <v-card>
           <v-card-title class=" text-subtitle-1 ">
             <span class="text-uppercase" v-if="!investment.fromInvestor">
@@ -33,7 +37,7 @@
           <v-divider></v-divider>
           <v-card-text>
             <v-row>
-              <v-col class=" py-0 d-flex justify-space-between">
+              <v-col cols="12" class=" py-0 d-flex justify-space-between">
                 <div
                   v-if="!investment.fromInvestor"
                   class="d-flex flex-column flex-sm-row "
@@ -51,9 +55,28 @@
                     }}</span>
                   </p>
                 </div>
-                <div>
-                  Effective Date
-                  <span class="font-weight-bold ml-2">{{ effectiveDate }}</span>
+                <div style="width:100%" class="d-flex justify-space-between">
+                  <div>
+                    Effective Date
+                    <span class="font-weight-bold ml-2">{{
+                      effectiveDate
+                    }}</span>
+                  </div>
+
+                  <div>
+                    <span class="mr-2 font-weight-bold">Status</span>
+                    <v-chip
+                      small
+                      depressed
+                      :color="
+                        investment.status === 'active' ? 'error' : 'success'
+                      "
+                      dark
+                      class="text-uppercase"
+                    >
+                      Active
+                    </v-chip>
+                  </div>
                 </div>
               </v-col>
               <v-col cols="12">
@@ -139,6 +162,15 @@ export default {
     investment: Object,
     toggleView: Function,
   },
+  filters: {
+    date(val) {
+      if (val) {
+        return val.toLocaleString();
+      } else {
+        //dadfad
+      }
+    },
+  },
   components: {
     EditInvestment,
   },
@@ -182,8 +214,11 @@ export default {
   },
 
   created() {
+    // this.effectiveDate = new Date(
+    //   this.investment.effectiveDate
+    // ).toLocaleDateString("en-NG");
     this.effectiveDate = new Date(
-      this.investment.effectiveDate
+      `${this.investment.effectiveDate}`
     ).toLocaleDateString("en-NG");
   },
   methods: {

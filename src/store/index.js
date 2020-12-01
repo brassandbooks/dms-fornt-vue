@@ -169,7 +169,7 @@ export default new Vuex.Store({
         .then(res => res.json())
         .then(resp => {
           let banks = []
-          banks.push('Brass & Books')
+          banks.push('Brass And Books')
           resp.data.forEach(bank => {
             banks.push(bank.name)
           })
@@ -552,9 +552,9 @@ export default new Vuex.Store({
             dispatch("Init_Alert", { type: "success", text: resp.message })
             dispatch("initInvestments")
           } else {
-
+            console.log(resp);
             commit("Set_Loading", { type: "updateInvestment", value: false })
-            dispatch("Init_Alert", { type: "error", text: resp.data[0].msg })
+            dispatch("Init_Alert", { type: "error", text: resp.message })
           }
         })
         .catch(err => {

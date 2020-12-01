@@ -136,6 +136,7 @@ export default {
 
     },
     created(){
+        
         this.getInvestor(this.$route.params.id)
         this.getInvestment(this.$route.params.id)
     },

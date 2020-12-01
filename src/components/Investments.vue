@@ -27,6 +27,7 @@
                         <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">New Investment</v-btn> -->
             </v-toolbar>
           </template>
+
           <template v-slot:item.actions="{ item }">
             <v-btn
               color="secondary primary--text"
@@ -115,9 +116,9 @@ export default {
           currency: "NGN",
         });
 
-        el.effectiveDate = new Date(el.effectiveDate).toLocaleDateString(
-          "en-NG"
-        );
+        // el.effectiveDate = new Date(`${el.effectiveDate}`).toLocaleDateString(
+        //   "en-NG"
+        // );
         el.expiringDate = new Date(el.expiringDate).toLocaleDateString("en-NG");
 
         el.payoutFrequency = frequency[value.indexOf(el.payoutFrequency)];

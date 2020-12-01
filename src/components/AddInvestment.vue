@@ -156,7 +156,6 @@ export default {
     product: "",
     distributionDates: [1, 5, 10, 19],
     payoutFrequencys: ["Monthly", "Quarterly", "Biannually", "Annually"],
-
     products: ["Bond Fund", "Growth Fund", "Term Fund", "Premium Fund"],
   }),
   computed: {
@@ -181,7 +180,7 @@ export default {
         const investment = {
           principalSum: parseFloat(this.principalSum),
           interestRate: parseFloat(this.interestRate),
-          effectiveDate: new Date(this.effectiveDate).getTime(),
+          effectiveDate: new Date(this.effectiveDate),
           investmentDuration: this.investmentDuration,
           distributionDate: this.distributionDate,
           payoutFrequency: value[frequency.indexOf(this.payoutFrequency)],

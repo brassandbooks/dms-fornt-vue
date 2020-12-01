@@ -173,7 +173,7 @@ export default {
       );
 
       this.investment.effectiveDate.toString();
-      console.log(this.investment.effectiveDate);
+
       const effectiveDate = new Date(this.investment.effectiveDate)
         .toISOString()
         .substr(0, 10);
@@ -211,9 +211,7 @@ export default {
         const investment = {
           principalSum: parseFloat(this.editedInvestment.principalSum),
           interestRate: parseFloat(this.editedInvestment.interestRate),
-          effectiveDate: new Date(
-            this.editedInvestment.effectiveDate
-          ).getTime(),
+          effectiveDate: new Date(this.editedInvestment.effectiveDate),
           investmentDuration: this.editedInvestment.investmentDuration,
           distributionDate: this.editedInvestment.distributionDate,
           payoutFrequency:
