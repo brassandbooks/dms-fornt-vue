@@ -136,6 +136,7 @@ export default {
 
     },
     created(){
+        
         this.getInvestor(this.$route.params.id)
         this.getInvestment(this.$route.params.id)
     },
@@ -145,7 +146,6 @@ export default {
 
         toggle(value, type){
             this.setDialog({type, value})
-            console.log(this.dialog);
         },
         closeAlert(){
             this.setAlert({is:false, type:"", text:""})

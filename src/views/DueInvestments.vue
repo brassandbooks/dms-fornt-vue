@@ -14,30 +14,91 @@
         </v-btn>
       </template>
     </v-snackbar>
-
     <v-row v-if="!showViewed" justify="center">
-      <v-col class="d-flex justify-end">
-        <v-btn
-          :disabled="!investments.length"
-          depressed
-          color="primary secondary--text "
+      <v-col cols="12" class="py-0 d-flex justify-space-between">
+        <v-form
+          @submit.prevent="filterDue"
+          ref="form"
+          v-model="valid"
+          :lazy-validation="lazy"
         >
-          <download-excel
-            header="DMS INVESTMENTS"
-            :data="jsonData"
-            :fields="json_fields"
-            worksheet="My Worksheet"
-            :stringifyLongNum="true"
-            name="dms-Investment.xls"
-          >
-            Export Excel
-          </download-excel>
-        </v-btn>
+          <v-row no-gutters>
+            <v-col cols="2" sm="2">
+              <v-text-field
+                :rules="[(v) => !!v || 'Year is required']"
+                class="ml-1"
+                outlined
+                dense
+                type="text"
+                v-model="filter.year"
+                :value="filter.year"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="4" sm="3">
+              <v-select
+                :rules="[(v) => !!v || 'Month is required']"
+                class="ml-1"
+                outlined
+                dense
+                :items="filter.months"
+                v-model="filter.month"
+                :value="filter.month"
+              ></v-select>
+            </v-col>
+            <v-col cols="3" sm="2">
+              <v-select
+                :rules="[(v) => !!v || 'Day is required']"
+                class="ml-1"
+                outlined
+                dense
+                :items="filter.days"
+                v-model="filter.day"
+                label="Day"
+              ></v-select>
+            </v-col>
+            <v-col cols="2" sm="2" class="ml-md-2">
+              <v-btn
+                class="d-none d-sm-flex"
+                type="submit"
+                depressed
+                color="primary secondary--text"
+              >
+                Filter
+              </v-btn>
+              <v-btn
+                type="submit"
+                class="d-flex d-sm-none ml-1"
+                color="primary  secondary--text"
+              >
+                <v-icon>mdi-magnify</v-icon>
+              </v-btn>
+            </v-col>
+            <v-col class="d-flex justify-end py-0 ">
+              <v-btn
+                :disabled="!investments.length"
+                depressed
+                color="primary secondary--text "
+              >
+                <download-excel
+                  :header="jsonHeader"
+                  :data="jsonData"
+                  :fields="json_fields"
+                  worksheet="My Worksheet"
+                  :stringifyLongNum="true"
+                  name="dms-Due-Investment.xls"
+                >
+                  Export Excel
+                </download-excel>
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-form>
       </v-col>
+
       <v-col cols="12" class="pt-0">
         <v-data-table
           :search="search"
-          :loading="loading.investments"
+          :loading="loading.dueInvestments"
           loading-text="Loading... Please wait"
           :headers="headers"
           :items="investments"
@@ -73,15 +134,14 @@
               Active
             </v-chip>
           </template>
-
           <template v-slot:item.actions="{ item }">
             <v-btn
               color="secondary primary--text"
               small
               depressed
-              @click="view(item)"
+              @click="pay(item)"
             >
-              view
+              pay
             </v-btn>
           </template>
         </v-data-table>
@@ -126,14 +186,22 @@ export default {
         value: "product",
       },
       {
-        text: "Payout Frequency",
-        value: "payoutFrequency",
-      },
-      {
-        text: "Principal Sum",
-        value: "principalSum",
+        text: "Distribution Amount",
+        value: "distributionAmount",
       },
 
+      {
+        text: "Month",
+        value: "month",
+      },
+      {
+        text: "Bank",
+        value: "bank",
+      },
+      {
+        text: "Account Number",
+        value: "accountNumber",
+      },
       {
         text: "Distribution Date",
         value: "distributionDate",
@@ -178,11 +246,10 @@ export default {
       Investor: "fullName",
       Product: "product",
       "Payout Frequency": "payoutFrequency",
-      "Principal Sum": "principalSum",
       "Distibution Amount": "distributionAmount",
       Bank: "bank",
       "Account Number": "accountNumber",
-
+      Month: "month",
       "Distribution Date": "distributionDate",
       "Expiring Date": "expiringDate",
     },
@@ -202,45 +269,41 @@ export default {
       alert: "Get_Alert",
       loading: "Get_Loading",
       user: "Get_User",
-      allInvestments: "Get_Investments",
+      allInvestments: "Get_DueInvestments",
     }),
-
     investments() {
       this.allInvestments.forEach((el) => {
-        const frequency = ["Monthly", "Quarterly", "Biannually", "Annually"];
-        const value = [1, 3, 6, 12];
         let fullName = `${el.investor.firstName} ${el.investor.lastName}`;
-
-        el.fullName = fullName;
         el.principalSum = el.principalSum.toLocaleString("en-NG", {
+          style: "currency",
+          currency: "NGN",
+        });
+        el.fullName = fullName;
+        el.distributionAmount = el.distributionAmount.toLocaleString("en-NG", {
           style: "currency",
           currency: "NGN",
         });
         el.bank = el.investor.bank;
         el.accountNumber = el.investor.accountNumber;
-        el.distributionAmount = el.distributionAmount.toLocaleString("en-NG", {
-          style: "currency",
-          currency: "NGN",
-        });
-        // el.effectiveDate = new Date(el.effectiveDate).toLocaleDateString(
-        //   "en-NG"
-        // );
+        el.effectiveDate = new Date(el.effectiveDate).toLocaleDateString(
+          "en-NG"
+        );
         el.expiringDate = new Date(el.expiringDate).toLocaleDateString("en-NG");
-        el.payoutFrequency = frequency[value.indexOf(el.payoutFrequency)];
       });
 
       return this.allInvestments;
     },
-
+    jsonHeader() {
+      return `DUE INVESTMENTS FOR THE MONTH OF ${this.filter.month} : ${this.filter.day}`;
+    },
     jsonData() {
       let excelData = [];
-
+      console.log(this.allInvestments);
       this.investments.forEach((el) => {
         let data = {
           fullName: el.fullName,
           product: el.product,
           payoutFrequency: el.payoutFrequency,
-          principalSum: el.principalSum,
           distributionAmount: el.distributionAmount,
           bank: el.bank,
           accountNumber: `ACC-${el.accountNumber}`,
@@ -254,8 +317,12 @@ export default {
     },
   },
   created() {
-    this.$store.dispatch("initInvestments");
     this.filter.month = this.filter.months[new Date().getMonth()];
+    this.$store.dispatch("dueInvestments", {
+      year: this.filter.year,
+      month: this.filter.month,
+      day: new Date().getDay(),
+    });
   },
   methods: {
     ...mapMutations({
@@ -263,7 +330,7 @@ export default {
       setDialog: "Set_Dialog",
     }),
     ...mapActions({
-      getInvestments: "initInvestments",
+      getInvestments: "dueInvestments",
     }),
 
     getSchedule(schedule) {
@@ -271,11 +338,20 @@ export default {
         return el.year === this.filter.year && el.month === this.filter.month;
       });
     },
-
-    view(item) {
-      item.fromInvestor = true;
-      this.viewedInvestment = item;
-      this.toggleView(true);
+    filterDue() {
+      if (this.$refs.form.validate()) {
+        this.all = false;
+        const date = {
+          year: this.filter.year,
+          month: this.filter.month,
+          day: this.filter.day,
+        };
+        this.getInvestments(date);
+        this.title = "Due Investments";
+      }
+    },
+    pay(item) {
+      console.log(item.schedule);
     },
 
     toggleView(on) {
@@ -294,6 +370,12 @@ export default {
       } else {
         this.init("filter");
       }
+    },
+    reset() {
+      this.$refs.form.reset();
+    },
+    resetValidation() {
+      this.$refs.form.resetValidation();
     },
   },
 };
