@@ -19,7 +19,7 @@
             <v-menu v-if="user !== null" transition="slide-y-transition" bottom offset-y>
                 <template v-slot:activator="{ on, attrs }">
                     <v-btn class="d-none d-sm-flex" color="primary" dark text v-bind="attrs" v-on="on">
-                        {{user.fullName}}
+                        {{ user !== null ?  user.fullName : 'username'}}
 
                     </v-btn>
                 </template>
@@ -39,7 +39,7 @@
             <v-list dense shaped color="primary">
                 <v-list-item >
                     <v-list-item-content>
-                       <v-list-item-title class="mb-2 text-subtitle-1">{{user.fullName}}</v-list-item-title>
+                       <v-list-item-title class="mb-2 text-subtitle-1">{{ user !== null ? user.fullName : 'username'}}</v-list-item-title>
                      <v-list-item-subtitle class="font-weight-normal">Logged In</v-list-item-subtitle>
                     </v-list-item-content>
                 </v-list-item>

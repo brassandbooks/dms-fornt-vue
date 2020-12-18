@@ -110,7 +110,9 @@ export default {
             allInvestments: "Get_Investments",
         }),
         investments() {
+            console.log(this.allInvestments);
             this.allInvestments.forEach((el) => {
+                
                 let name = `${el.investorDetails.firstName} ${el.investorDetails.lastName}`;
                 el.investor = name;
 
