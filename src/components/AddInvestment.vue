@@ -171,6 +171,7 @@ export default {
       this.toggle(false, "investment");
       this.reset();
       this.resetValidation();
+      //just nothing
     },
     save() {
       if (this.$refs.form.validate()) {
