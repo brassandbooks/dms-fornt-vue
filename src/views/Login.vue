@@ -106,9 +106,8 @@ export default {
           email: this.email,
           password: this.password,
         };
-        console.log(this.loading.login)
         this.login(user)    
-        console.log(this.loading.login)
+
       }
     },
 
