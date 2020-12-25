@@ -12,7 +12,6 @@ export default new Vuex.Store({
     },
 
     loading: {
-
       add: false,
       addInvestment: false,
       dueInvestments: false,
@@ -22,6 +21,7 @@ export default new Vuex.Store({
       investors: false,
       investments: false,
       singleInvestment: false,
+      expiring: false,
     },
 
     dialog: {
@@ -50,6 +50,7 @@ export default new Vuex.Store({
     investments: [],
     dueInvestments: [],
     investment: [],
+    expiring: [],
     banks: []
 
   },
@@ -92,6 +93,9 @@ export default new Vuex.Store({
     },
     "Get_Investment"(state) {
       return state.investment
+    },
+    "Get_Expiring"(state){
+      return state.expiring
     }
   },
   mutations: {
@@ -132,6 +136,9 @@ export default new Vuex.Store({
     },
     "Set_Investment"(state, investment) {
       state.investment = investment
+    },
+    "Set_Expiring"(state, investment) {
+      state.expiring = investment
     }
   },
   actions: {
@@ -493,6 +500,41 @@ export default new Vuex.Store({
 
           }
         })
+    },
+
+    getExpiring({commit, state, dispatch}, date){
+      dispatch("initInvestments")
+      commit("Set_Loading", { type: "expiring", value: true })
+      
+      let Expired = []
+      const monthsName = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ]
+
+      state.investments.forEach(el => {
+        let expiringYear = (new Date(el.expiringDate).getFullYear()).toString()
+        let expiringMonth =  monthsName[new Date(el.expiringDate).getMonth()]
+        if(date.year === expiringYear && date.month == expiringMonth){
+          el.month = expiringMonth
+          Expired.push(el)
+        }
+      })
+
+      commit("Set_Expiring", Expired)
+      setTimeout(()=> {
+        commit("Set_Loading", { type: "expiring", value: false })
+      },1000)
     },
 
     async updateInvestor({ commit, dispatch }, investor) {

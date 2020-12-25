@@ -163,7 +163,7 @@ import ViewInvestment from "../components/ViewInvestment";
 import { mapActions, mapGetters, mapMutations } from "vuex";
 
 export default {
-  name: "Home",
+  name: "Due Investment",
   components: {
     ViewInvestment,
   },
@@ -267,7 +267,7 @@ export default {
       alert: "Get_Alert",
       loading: "Get_Loading",
       user: "Get_User",
-      allInvestments: "Get_DueInvestments",
+      allInvestments: "Get_DueInvestments"
     }),
     investments() {
       this.allInvestments.forEach((el) => {
@@ -297,7 +297,7 @@ export default {
     },
     jsonData() {
       let excelData = [];
-      console.log(this.allInvestments);
+  
       this.investments.forEach((el) => {
         let data = {
           fullName: el.fullName,
@@ -322,6 +322,8 @@ export default {
       month: this.filter.month,
       day: new Date().getDay(),
     });
+
+
   },
   methods: {
     ...mapMutations({
@@ -355,10 +357,8 @@ export default {
         let now = new Date();
        if(date <= now){
          isExpired = true
-         console.log('Expire');
         }else {
           isExpired = false
-          console.log('Ongoing');
         }
         return isExpired
     },

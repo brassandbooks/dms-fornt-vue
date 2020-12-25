@@ -29,6 +29,22 @@
           @click.stop="toggle(true, 'investor')"
           >New Investors</v-btn
         >
+         <v-btn
+          :disabled="!investors.length"
+          depressed
+          color="primary secondary--text ml-2"
+        >
+          <download-excel
+            header="DMS INVESTORS"
+            :data="jsonData"
+            :fields="json_fields"
+            worksheet="My Worksheet"
+            :stringifyLongNum="true"
+            name="dms-Investors.xls"
+          >
+            Export Excel
+          </download-excel>
+        </v-btn>
       </v-col>
       <v-col cols="12">
         <v-data-table
@@ -114,6 +130,24 @@ export default {
         sortable: false,
       },
     ],
+
+    json_fields: {
+      'First Name': "firstName",
+      'Last Name': "lastName",
+      "Phone Number": "phoneNumber",
+      Email : 'email',
+      Bank: "bank",
+      "Account Number": "accountNumber",
+    },
+
+    json_meta: [
+      [
+        {
+          key: "charset",
+          value: "utf-8",
+        },
+      ],
+    ],
   }),
 
   computed: {
@@ -124,6 +158,24 @@ export default {
       loading: "Get_Loading",
       dialog: "Get_Dialog",
     }),
+
+    jsonData() {
+      let excelData = [];
+
+      this.investors.forEach((el) => {
+        let data = {
+          firstName: el.firstName,
+          lastName: el.lastName,
+      phoneNumber: el.phoneNumber,
+     email: el.email,
+     bank: el.bank,
+     accountNumber: el.accountNumber,
+        };
+        excelData.push(data);
+      });
+
+      return excelData;
+    },
   },
   created() {
     this.$store.dispatch("initInvestors");

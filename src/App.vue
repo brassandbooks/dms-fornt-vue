@@ -52,6 +52,15 @@
         >
           Due Investments
         </v-btn>
+        <v-btn
+          class="d-none d-sm-flex"
+          text
+          color="primary"
+          to="/expiring"
+          exact-active-class="secondary"
+        >
+          Expiring
+        </v-btn>
         <v-spacer> </v-spacer>
         <v-menu
           v-if="user !== null"
@@ -167,6 +176,11 @@ export default {
         name: "Due Investments",
         route: "/dueinvestments",
         icon: "mdi-cash-plus",
+      },
+      {
+        name: "Expiring",
+        route: "/expiring",
+        icon: "mdi-cash-remove",
       },
     ],
   }),
