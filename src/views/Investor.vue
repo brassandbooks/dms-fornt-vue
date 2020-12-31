@@ -30,7 +30,7 @@
                 Go Back
             </v-btn>
 
-     <v-btn  color="primary secondary--text " dark class="mb-2"   @click.stop="toggle(true, 'investment')" >New Investment</v-btn>
+     <v-btn :disabled="authorize"  color="primary secondary--text " dark class="mb-2"   @click.stop="toggle(true, 'investment')" >New Investment</v-btn>
         </v-col>
         <v-col cols="12">
             <v-card class="px-3">
@@ -131,7 +131,8 @@ export default {
         ...mapGetters({
             alert:"Get_Alert", dialog:"Get_Dialog",
             investor:"Get_Investor",
-            allInvestments: 'Get_Investment'
+            allInvestments: 'Get_Investment',
+            authorize: "Get_Authorize",
         }),
 
     },

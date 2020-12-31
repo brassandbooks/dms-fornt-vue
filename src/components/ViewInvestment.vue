@@ -8,6 +8,7 @@
           </v-btn> -->
           <v-spacer></v-spacer>
           <v-btn
+          :disabled="authorize"
             @click.stop="toggle(true, 'updateInvestment')"
             depressed
             color="primary secondary--text"
@@ -210,7 +211,7 @@ export default {
     ],
   }),
   computed: {
-    ...mapGetters({ alert: "Get_Alert", dialog: "Get_Dialog" }),
+    ...mapGetters({ alert: "Get_Alert", dialog: "Get_Dialog", authorize: "Get_Authorize", }),
   },
 
   created() {

@@ -6,7 +6,8 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    login: false,
+    authorize: false,
+    login: true,
     error: {
       update: ""
     },
@@ -18,6 +19,7 @@ export default new Vuex.Store({
       update: false,
       updateInvestment: false,
       login: false,
+      register: false,
       investors: false,
       investments: false,
       singleInvestment: false,
@@ -56,6 +58,9 @@ export default new Vuex.Store({
   },
   getters: {
 
+    "Get_Authorize"(state){
+      return state.authorize
+    },
 
     "Get_Banks"(state) {
       return state.banks
@@ -99,6 +104,9 @@ export default new Vuex.Store({
     }
   },
   mutations: {
+    "Set_Authorize"(state, status){
+      state.authorize = status
+    },
     "Set_Alert"(state, alert) {
       state.alert = alert
     },
@@ -142,7 +150,6 @@ export default new Vuex.Store({
     }
   },
   actions: {
-
 
     "Init_Alert"({ commit }, alert) {
       let time
@@ -188,6 +195,50 @@ export default new Vuex.Store({
         })
     },
 
+    async "Create_User"({ commit, dispatch }, user ) {
+
+      
+      commit("Set_Loading", { type: "register", value: true })
+
+      await fetch("https://bbdms.herokuapp.com/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(user)
+      })
+        .then(res => res.json())
+        .then(resp => {
+          if (resp.status == 1) {
+
+            //set userToken to local storage
+            localStorage.setItem('userToken', (resp.data.token));
+
+            //decode token and set user
+            const decoded = Vue.$jwt.decode(resp.data.token)
+            const user = {
+              email: decoded.email,
+              fullName: `${decoded.firstName} ${decoded.lastName}`,
+              id: decoded.id
+            }
+            //set the curretn user
+            commit("Set_User", user)
+            commit("Set_Login", true)
+            commit("Set_Loading", { type: "register", value: false })
+            router.push('/')
+
+          } else {
+            console.log(resp.message);
+            commit("Set_Loading", { type: "register", value: false })
+            dispatch("Init_Alert", { type: "error", text: resp.message })
+          }
+        })
+        .catch(err => {
+          commit("Set_Loading", { type: "register", value: false })
+          console.log(err.message)
+        })
+
+    },
     async "Login_User"({ commit, dispatch }, user) {
 
       commit("Set_Loading", { type: "login", value: true })
@@ -606,7 +657,8 @@ export default new Vuex.Store({
         })
 
     },
-    authenticated({ commit, dispatch }, path) {
+    authenticated({ commit, dispatch}, path) {
+      
       const token = localStorage.getItem('userToken')
       if (token) {
         const decoded = Vue.$jwt.decode(token)
@@ -623,6 +675,13 @@ export default new Vuex.Store({
             id: decoded.id
           }
           commit("Set_User", user)
+
+          if( user.email === 'lucky@brassandbooks.com.ng' || user.email === 'solomon@brassandbooks.com.ng' || user.email === 'whyte.peter@brassandbooks.com.ng'){
+            commit('Set_Authorize', false)
+          }else {
+            commit('Set_Authorize', true)
+
+          }
 
           if (path !== '/') {
             router.push("/")
@@ -642,12 +701,3 @@ export default new Vuex.Store({
 
 // https://bbdms.herokuapp.com/api/auth/login
 
-// POST: email, password
-
-// /investor
-// POST firstName, lastName, otherNames, email, phoneNumber
-// GET
-
-// /investor/id
-// GET
-// PUT

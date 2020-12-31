@@ -70,15 +70,19 @@
         </v-card>
       </v-col>
     </v-row>
+   
   </v-container>
 </template>
 
 <script>
 // @ is an alias to /src
 import {mapGetters, mapActions} from 'vuex'
+
 export default {
   name: "Login",
+
   data: () => ({
+
     valid: true,
     email: "",
     password: "",

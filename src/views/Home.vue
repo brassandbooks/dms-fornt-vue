@@ -23,6 +23,7 @@
         <v-spacer></v-spacer>
         <v-btn
           depressed
+          :disabled="authorize"
           color="primary secondary--text"
           dark
           class="mb-2"
@@ -157,6 +158,7 @@ export default {
       user: "Get_User",
       loading: "Get_Loading",
       dialog: "Get_Dialog",
+      authorize: "Get_Authorize",
     }),
 
     jsonData() {
@@ -179,6 +181,7 @@ export default {
   },
   created() {
     this.$store.dispatch("initInvestors");
+    console.log(this.authorize);
   },
   methods: {
     ...mapMutations({
