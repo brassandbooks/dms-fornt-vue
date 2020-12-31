@@ -73,7 +73,7 @@
                                 </v-col>
                                 <v-col cols="2" class="d-flex align-center justify-end" >
                                     
-                                    <v-btn  @click.stop="toggle(true, 'update')" outlined depressed color="primary">
+                                    <v-btn :disabled="authorize"  @click.stop="toggle(true, 'update')" outlined depressed color="primary">
                                         Edit
                                     </v-btn>
                                 </v-col>
