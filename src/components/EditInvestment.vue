@@ -185,11 +185,12 @@ export default {
         distributionDate: this.investment.distributionDate,
         payoutFrequency: this.investment.payoutFrequency,
         product: this.investment.product,
-        investor: this.investment.investorDetails._id,
+        investor: this.investment.investor._id,
         id: this.investment._id,
       };
     },
   },
+
 
   methods: {
     ...mapActions({
