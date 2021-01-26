@@ -37,6 +37,7 @@
                 <v-card-title class=" text-subtitle-1">
                     {{`${investor.firstName} ${investor.lastName} ${investor.otherNames}`}}
                     <v-divider class="mx-4" inset vertical></v-divider>
+                    <strong>ID:</strong>{{investor.id}}
                     <v-spacer></v-spacer>
                     <div>
                         Total Investments <span class="secondary py-1 px-2 rounded font-weight-medium">{{allInvestments.length}}</span>

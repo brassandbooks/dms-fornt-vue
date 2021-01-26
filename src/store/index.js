@@ -6,7 +6,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    authorize: false,
+    authorize: true,
     login: true,
     error: {
       update: ""
@@ -24,6 +24,7 @@ export default new Vuex.Store({
       investments: false,
       singleInvestment: false,
       expiring: false,
+      otp:false
     },
 
     dialog: {
@@ -195,9 +196,9 @@ export default new Vuex.Store({
         })
     },
 
-    async "Create_User"({ commit, dispatch }, user ) {
+    async "Create_User"({ commit, state,dispatch }, user ) {
 
-      
+      if(!state.authorize){
       commit("Set_Loading", { type: "register", value: true })
 
       await fetch("https://bbdms.herokuapp.com/api/auth/register", {
@@ -225,7 +226,7 @@ export default new Vuex.Store({
             commit("Set_User", user)
             commit("Set_Login", true)
             commit("Set_Loading", { type: "register", value: false })
-            router.push('/')
+            router.push('/otp')
 
           } else {
             console.log(resp.message);
@@ -235,6 +236,39 @@ export default new Vuex.Store({
         })
         .catch(err => {
           commit("Set_Loading", { type: "register", value: false })
+          console.log(err.message)
+        })
+      }else{
+        
+        dispatch("Init_Alert", { type: "error", text: 'You are not authorized to Create an Account' })
+      }
+
+    },
+    async "Verify_Account"({ commit, dispatch }, payload ) {
+
+      commit("Set_Loading", { type: "otp", value: true })
+
+      await fetch("https://bbdms.herokuapp.com/api/auth/verify-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      })
+        .then(res => res.json())
+        .then(resp => {
+          if (resp.status == 1) {
+
+            router.push('/login')
+
+          } else {
+            console.log(resp.message);
+            commit("Set_Loading", { type: "otp", value: false })
+            dispatch("Init_Alert", { type: "error", text: resp.message })
+          }
+        })
+        .catch(err => {
+          commit("Set_Loading", { type: "otp", value: false })
           console.log(err.message)
         })
 
@@ -269,7 +303,7 @@ export default new Vuex.Store({
             commit("Set_Login", true)
             commit("Set_Loading", { type: "login", value: false })
             router.push('/')
-
+            location.reload();
           } else {
 
             commit("Set_Loading", { type: "login", value: false })
@@ -287,7 +321,9 @@ export default new Vuex.Store({
       localStorage.removeItem('userToken');
       commit("Set_User", null)
       commit("Set_Login", false)
+      commit('Set_Authorize', true)
       router.push('/login')
+      location.reload();
     },
 
     async initInvestors({ commit, dispatch }) {
@@ -427,9 +463,9 @@ export default new Vuex.Store({
     },
 
 
-    async addInvestment({ commit, dispatch }, investment) {
+    async addInvestment({ commit, state,dispatch }, investment) {
 
-
+if(!state.authorize){
       commit("Set_Loading", { type: "addInvestment", value: true })
       const token = localStorage.getItem('userToken')
 
@@ -459,11 +495,15 @@ export default new Vuex.Store({
           commit("Set_Loading", { type: "addInvestment", value: false })
           dispatch("Init_Alert", { type: "error", text: err })
         })
+      }else{
+        
+        dispatch("Init_Alert", { type: "error", text: 'You are not authorized' })
+      }
     },
 
 
-    async addInvestor({ commit, dispatch }, investor) {
-
+    async addInvestor({ commit, state,dispatch }, investor) {
+if(!state.authorize){
       commit("Set_Loading", { type: "add", value: true })
       const token = localStorage.getItem('userToken')
 
@@ -492,6 +532,10 @@ export default new Vuex.Store({
           commit("Set_Loading", { type: "add", value: false })
           dispatch("Init_Alert", { type: "error", text: err.message })
         })
+      }else{
+        
+        dispatch("Init_Alert", { type: "error", text: 'You are not authorized' })
+      }
     },
 
     async getInvestor({ commit, dispatch }, id) {
@@ -542,6 +586,7 @@ export default new Vuex.Store({
           if (resp.status == 1) {
 
             commit("Set_Investment", resp.data)
+            console.log(resp.data);
             commit("Set_Loading", { type: "singleInvestment", value: false })
 
           } else {
@@ -588,8 +633,8 @@ export default new Vuex.Store({
       },1000)
     },
 
-    async updateInvestor({ commit, dispatch }, investor) {
-
+    async updateInvestor({ commit,state, dispatch }, investor) {
+      if(!state.authorize){
       commit("Set_Loading", { type: "update", value: true })
 
       const token = localStorage.getItem('userToken')
@@ -621,11 +666,16 @@ export default new Vuex.Store({
           dispatch("Init_Alert", { type: "error", text: err.message })
           console.log(err);
         })
+      }else{
+        
+        dispatch("Init_Alert", { type: "error", text: 'You are not authorized' })
+      }
 
     },
-    async updateInvestment({ commit, dispatch }, investment) {
+    async updateInvestment({ commit,state, dispatch }, investment) {
 
-      commit("Set_Loading", { type: "updateInvestment", value: true })
+      if(!state.authorize){
+        commit("Set_Loading", { type: "updateInvestment", value: true })
 
       const token = localStorage.getItem('userToken')
       await await fetch(`https://bbdms.herokuapp.com/api/investment/${investment.id}`, {
@@ -655,10 +705,13 @@ export default new Vuex.Store({
           dispatch("Init_Alert", { type: "error", text: err.message })
           console.log(err);
         })
+      }else{
+        
+        dispatch("Init_Alert", { type: "error", text: 'You are not authorized' })
+      }
 
     },
     authenticated({ commit, dispatch}, path) {
-      
       const token = localStorage.getItem('userToken')
       if (token) {
         const decoded = Vue.$jwt.decode(token)
@@ -676,13 +729,14 @@ export default new Vuex.Store({
           }
           commit("Set_User", user)
 
-          if( user.email === 'lucky@brassandbooks.com.ng' || user.email === 'solomon@brassandbooks.com.ng' || user.email === 'whyte.peter@brassandbooks.com.ng'){
+          if( user.email === 'lucky@brassandbooks.com.ng' || user.email === 'solomon@brassandbooks.com.ng' || user.email === 'whyte.peter@brassandbooks.com.ng' ){
             commit('Set_Authorize', false)
+            
           }else {
             commit('Set_Authorize', true)
 
           }
-
+          
           if (path !== '/') {
             router.push("/")
           }

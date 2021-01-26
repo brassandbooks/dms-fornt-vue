@@ -14,7 +14,7 @@
                 <v-img src="../assets/logo.png"></v-img>
               </v-list-item-avatar>
               <v-list-item-content class="">
-                <v-list-item-title>Create Account</v-list-item-title>
+                <v-list-item-title>Verify Account</v-list-item-title>
               </v-list-item-content>
             </v-list>
           </v-card-title>
@@ -31,27 +31,16 @@
                 <v-col cols="12" class="px-2">
                   <v-text-field
                     color="primary"
-                    v-model="firstName"
-                    :rules="firstNameRules"
+                    v-model="otp"
+                    :rules="otpRules"
                     type="text"
-                    name="firstName"
-                    label="First Name"
-                    @click:append="show = !show"
+                    name="text"
+                    label="Enter OTP"
+
                     prepend-icon="mdi-account"
                   ></v-text-field>
                 </v-col>
-                <v-col cols="12" class="px-2">
-                  <v-text-field
-                    color="primary"
-                    v-model="lastName"
-                    :rules="lastNameRules"
-                    type="text"
-                    name="lastName"
-                    label="Last Name"
-                    @click:append="show = !show"
-                    prepend-icon="mdi-account"
-                  ></v-text-field>
-                </v-col>
+               
                 
                 <v-col cols="12" class="px-2">
                   <v-text-field
@@ -65,19 +54,7 @@
                     prepend-icon="mdi-email"
                   ></v-text-field>
                 </v-col>
-                <v-col cols="12" class="px-2">
-                  <v-text-field
-                    color="primary"
-                    v-model="password"
-                    :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
-                    :rules="required"
-                    :type="show ? 'text' : 'password'"
-                    name="password"
-                    label="Password"
-                    @click:append="show = !show"
-                    prepend-icon="mdi-lock"
-                  ></v-text-field>
-                </v-col>
+                
                 <v-col cols="12" class="mb-4">
                   <v-btn text small color="primary">
                     <v-icon small class="mr-2">mdi-lock</v-icon>
@@ -85,8 +62,8 @@
                   </v-btn>
                 </v-col>
                 <v-col cols="12" class="px-2">
-                  <v-btn type="submit" :loading="loading.register" block color="primary"
-                    >Sign up</v-btn>
+                  <v-btn type="submit" :loading="loading.otp" block color="primary"
+                    >Verify Account</v-btn>
                 </v-col>
               </v-row>
             </v-form>
@@ -104,13 +81,9 @@ export default {
   name: "Register",
   data: () => ({
     valid: true,
-    firstName: "",
-    firstNameRules: [ (v) => !!v || "E-mail is required"],
-    lastName: "",
-    lastNameRules: [ (v) => !!v || "E-mail is required"],
-    email: "",
-    password: "",
-    terms: null,
+    otp: "",
+    otpRules: [ (v) => !!v || "E-mail is required"],
+   email: "",
     show: false,
     required: [(v) => !!v || "Name is required"],
     emailRules: [
@@ -130,16 +103,14 @@ export default {
    }
   },
   methods: {
-      ...mapActions({login:"Create_User"}),
+      ...mapActions({verifyAccount:"Verify_Account"}),
     submit() {
       if (this.$refs.form.validate()) {
-        const user = {
-          firstName:this.firstName,
-          lastName:this.lastName,
+        const payload = {
           email: this.email,
-          password: this.password,
+          otp: this.otp,
         };
-        this.login(user)    
+        this.verifyAccount(payload)    
 
       }
     },

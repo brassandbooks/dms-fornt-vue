@@ -70,6 +70,22 @@ const routes = [
     // this generates a separate chunk (investor.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "investor" */ '../views/Investor.vue')
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    // route level code-splitting
+    // this generates a separate chunk (Register.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "Register" */ '../views/Register.vue')
+  },
+  {
+    path: '/otp',
+    name: 'OTP',
+    // route level code-splitting
+    // this generates a separate chunk (OTP.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "OTP" */ '../views/otp.vue')
   }
 ]
 

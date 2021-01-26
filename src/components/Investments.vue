@@ -101,10 +101,10 @@ export default {
     }),
     investments() {
       this.allInvestments.forEach((el) => {
+       
         const frequency = ["Monthly", "Quarterly", "Biannually", "Annually"];
         const value = [1, 3, 6, 12];
-        let name = `${el.investorDetails.firstName} ${el.investorDetails.lastName}`;
-        el.investor = name;
+       
 
         el.principalSum = el.principalSum.toLocaleString("en-NG", {
           style: "currency",
@@ -127,7 +127,9 @@ export default {
       return this.allInvestments;
     },
   },
-
+created(){
+ console.log(this.allInvestments);
+},
   methods: {
     view(item) {
       item.fromInvestor = true;

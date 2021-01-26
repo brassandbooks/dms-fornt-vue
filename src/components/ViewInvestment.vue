@@ -26,6 +26,7 @@
             </span>
             <span class="text-uppercase" v-else>investment</span>
             <v-divider class="mx-4" vertical></v-divider>
+            <strong>ID:</strong>{{investment._id}}
             <v-spacer></v-spacer>
 
             <v-btn @click="toggleView(false)" small outlined color="primary">
@@ -221,6 +222,8 @@ export default {
     this.effectiveDate = new Date(
       `${this.investment.effectiveDate}`
     ).toLocaleDateString("en-NG");
+
+   console.log(this.investment);
   },
   methods: {
     ...mapMutations({ setAlert: "Set_Alert", setDialog: "Set_Dialog" }),

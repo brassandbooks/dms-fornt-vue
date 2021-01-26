@@ -207,18 +207,19 @@ export default {
     }),
 
     investments() {
+  console.log(this.allInvestments);
       this.allInvestments.forEach((el) => {
         const frequency = ["Monthly", "Quarterly", "Biannually", "Annually"];
         const value = [1, 3, 6, 12];
-        let fullName = `${el.investor.firstName} ${el.investor.lastName}`;
+        let fullName = `${el.investor && el.investor.firstName} ${el.investor && el.investor.lastName}`;
 
         el.fullName = fullName;
         el.principalSum = el.principalSum.toLocaleString("en-NG", {
           style: "currency",
           currency: "NGN",
         });
-        el.bank = el.investor.bank;
-        el.accountNumber = el.investor.accountNumber;
+        el.bank = el.investor && el.investor.bank;
+        el.accountNumber = el.investor && el.investor.accountNumber;
         el.distributionAmount = el.distributionAmount.toLocaleString("en-NG", {
           style: "currency",
           currency: "NGN",
@@ -280,10 +281,8 @@ checkExpired(expired){
         let now = new Date();
        if(date <= now){
          isExpired = true
-         console.log('Expire');
         }else {
           isExpired = false
-          console.log('Ongoing');
         }
         return isExpired
     },
