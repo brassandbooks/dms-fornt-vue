@@ -105,7 +105,6 @@ export default {
         const frequency = ["Monthly", "Quarterly", "Biannually", "Annually"];
         const value = [1, 3, 6, 12];
        
-
         el.principalSum = el.principalSum.toLocaleString("en-NG", {
           style: "currency",
           currency: "NGN",
@@ -115,7 +114,7 @@ export default {
           style: "currency",
           currency: "NGN",
         });
-
+el.status = this.checkExpired(el.expiringDate)
         // el.effectiveDate = new Date(`${el.effectiveDate}`).toLocaleDateString(
         //   "en-NG"
         // );
@@ -136,7 +135,17 @@ created(){
       this.viewedInvestment = item;
       this.toggleView(true);
     },
-
+checkExpired(expired){
+      let isExpired
+        let date = new Date(expired);
+        let now = new Date();
+       if(date <= now){
+         isExpired = true
+        }else {
+          isExpired = false
+        }
+        return isExpired
+    },
     toggleView(on) {
       this.showViewed = on;
     },
